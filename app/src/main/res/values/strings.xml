@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">GCRClient</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string name="hello_fragment_introduction">Welcome to GCRClient</string>
+    <string name="hello_fragment_get_started">Get started</string>
+    <string name="hello_fragment_what_is">What is Gerrit?</string>
+    <string name="input_fragment_introduction">Login</string>
+    <string name="input_fragment_check_connection">Check connection</string>
+    <string name="server_hint">Server</string>
+    <string name="input_fragment_bad_connection">Failed to get response from server</string>
+    <string name="input_fragment_bad_server_name">Bad server address</string>
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="input_fragment_lets_go">Let\'s go</string>
+    <string name="input_fragment_bad_username">Failed to verify username</string>
+    <string name="input_fragment_bad_password">Wrong password</string>
+</resources>
