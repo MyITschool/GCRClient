@@ -1,40 +1,28 @@
 package com.elseboot3909.GCRClient;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.elseboot3909.GCRClient.API.ConfigAPI;
-import com.elseboot3909.GCRClient.Utils.Constants;
-import com.elseboot3909.GCRClient.Utils.Transitions;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.transition.MaterialSharedAxis;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ServerInputFragment extends Fragment {
@@ -52,9 +40,6 @@ public class ServerInputFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //setEnterTransition(Transitions.getForwardTransition());
-        //setExitTransition(Transitions.getForwardTransition());
 
         if (savedInstanceState != null) SavedServerName = savedInstanceState.getString(ARG_SERVER_NAME);
     }
@@ -92,6 +77,7 @@ public class ServerInputFragment extends Fragment {
         CheckConnection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setError(ServerNameTextField, "");
                 String server = ServerName.getText().toString();
                 try {
                     new URL(server);
@@ -112,21 +98,26 @@ public class ServerInputFragment extends Fragment {
 
                 version.enqueue(new Callback<String>() {
                     @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
+                    public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                         progressBar.setVisibility(View.GONE);
                         if (response.isSuccessful()) {
                             LoginFragment loginFragment = new LoginFragment();
                             Bundle args = new Bundle();
                             args.putString(ARG_SERVER_NAME, server);
                             loginFragment.setArguments(args);
-                            getParentFragmentManager().beginTransaction().replace(R.id.login_container, loginFragment).addToBackStack(null).commit();
+                            getParentFragmentManager()
+                                    .beginTransaction()
+                                    .setCustomAnimations(R.anim.enter_from_right, R.anim.quit_to_left, R.anim.enter_from_left, R.anim.quit_to_right)
+                                    .replace(R.id.login_container, loginFragment)
+                                    .addToBackStack(null)
+                                    .commit();
                         } else {
                             setError(ServerNameTextField, getResources().getString(R.string.input_fragment_bad_connection));
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<String> call, Throwable t) {
+                    public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
                         progressBar.setVisibility(View.GONE);
                         setError(ServerNameTextField, getResources().getString(R.string.input_fragment_bad_connection));
                     }

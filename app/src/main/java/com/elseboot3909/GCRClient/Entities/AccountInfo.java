@@ -15,6 +15,9 @@ public class AccountInfo {
 
     private String username;
 
+    @SerializedName("display_name")
+    private String displayedName;
+
     public Integer getAccountId() {
         return accountId;
     }
@@ -38,8 +41,5 @@ public class AccountInfo {
     public String getDisplayedName() {
         return displayedName;
     }
-
-    @SerializedName("display_name")
-    private String displayedName;
 
 }

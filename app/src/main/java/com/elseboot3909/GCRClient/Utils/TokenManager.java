@@ -18,11 +18,12 @@ public class TokenManager {
             return sharedPreferences;
         }
 
-        String masterKeyAlias = null;
+        String masterKeyAlias;
         try {
             masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
+            return null;
         }
 
         SharedPreferences sharedPreferences = null;
@@ -41,7 +42,7 @@ public class TokenManager {
     }
 
     public static boolean isSharedPreferencesEmpty(Context context) {
-        return TokenManager.getSharedPreferences(context).getString(Constants.STORED_TOKENS, "").equals("");
-    };
+        return TokenManager.getSharedPreferences(context) == null || TokenManager.getSharedPreferences(context).getString(Constants.STORED_TOKENS, "").equals("");
+    }
 
 }

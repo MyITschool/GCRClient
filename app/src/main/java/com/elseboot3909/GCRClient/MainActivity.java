@@ -12,8 +12,6 @@ import com.elseboot3909.GCRClient.Utils.TokenManager;
 
 public class MainActivity extends AppCompatActivity {
 
-    //private static final String GERRIT_URL = "gerrit.twrp.me/";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
