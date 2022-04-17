@@ -6,10 +6,10 @@ import retrofit2.http.Path;
 
 public interface AccountAPI {
 
-    @GET("/accounts/{user}")
+    @GET("accounts/{user}")
     Call<String> getAccountInfo(@Path("user") String user);
 
-    @GET("/a/accounts/self/oauthtoken")
+    @GET("a/accounts/self/oauthtoken")
     Call<String> getOAuthToken();
 
 }

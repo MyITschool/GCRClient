@@ -18,4 +18,13 @@ public class OAuthTokenInfo {
     private String expires;
 
     private String type;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
 }

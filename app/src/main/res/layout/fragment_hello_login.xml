@@ -23,7 +23,7 @@
         app:layout_constraintVertical_bias="0.50" />
 
     <Button
-        android:id="@+id/next_button"
+        android:id="@+id/nextButton"
         style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
         app:layout_constraintVertical_bias="0.90" />
 
     <Button
-        android:id="@+id/what_is"
+        android:id="@+id/whatIs"
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

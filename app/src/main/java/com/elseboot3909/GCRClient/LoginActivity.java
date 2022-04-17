@@ -6,10 +6,9 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import com.elseboot3909.GCRClient.Utils.Constants;
-import com.elseboot3909.GCRClient.Utils.TokenManager;
+import com.elseboot3909.GCRClient.Utils.ServerDataManager;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -20,17 +19,14 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.e(Constants.LOG_TAG, "Launching LoginActivity!");
 
-        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-            @Override
-            public void onBackStackChanged() {
-                currentFragment = getSupportFragmentManager().findFragmentById(R.id.login_container);
-            }
-        });
+        overridePendingTransition(R.anim.enter_from_right, R.anim.quit_to_left);
+
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> currentFragment = getSupportFragmentManager().findFragmentById(R.id.login_container));
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         setContentView(R.layout.activity_login);
-        if (TokenManager.isSharedPreferencesEmpty(getApplicationContext())) {
+        if (ServerDataManager.isSharedPreferencesEmpty(getApplicationContext(), Constants.STORED_TOKENS)) {
             getSupportFragmentManager().beginTransaction().add(R.id.login_container, new HelloLoginFragment()).commit();
         } else {
             getSupportFragmentManager().beginTransaction().add(R.id.login_container, new ServerInputFragment()).commit();
@@ -47,4 +43,11 @@ public class LoginActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.enter_from_left, R.anim.quit_to_right);
+    }
+
 }

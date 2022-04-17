@@ -5,7 +5,7 @@ import retrofit2.http.GET;
 
 public interface ConfigAPI {
 
-    @GET("/config/server/version")
+    @GET("config/server/version")
     Call<String> getVersion();
 
 }
