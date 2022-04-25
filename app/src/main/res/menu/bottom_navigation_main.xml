@@ -3,16 +3,16 @@
     <item
         android:id="@+id/changes"
         android:enabled="true"
-        android:icon="@drawable/ic_home_selector"
-        android:title="Explore" />
+        android:icon="@drawable/ic_selector_home"
+        android:title="@string/explore" />
     <item
         android:id="@+id/stared"
         android:enabled="true"
-        android:icon="@drawable/ic_star_selector"
-        android:title="Stared" />
+        android:icon="@drawable/ic_selector_star"
+        android:title="@string/stared" />
     <item
         android:id="@+id/profile"
         android:enabled="true"
-        android:icon="@drawable/ic_person_selector"
-        android:title="Profile" />
+        android:icon="@drawable/ic_selector_person"
+        android:title="@string/profile" />
 </menu>

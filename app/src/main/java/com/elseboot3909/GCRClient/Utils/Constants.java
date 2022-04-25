@@ -6,4 +6,6 @@ public class Constants {
     public static final String SELECTED_SERVER = "selected_server";
 
     public static final Integer NAV_DRAWER_TIMEOUT = 250;
+    public static final Integer SEARCH_EXITED = 0;
+    public static final Integer SEARCH_ACQUIRED = 1;
 }

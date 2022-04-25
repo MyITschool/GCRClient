@@ -19,6 +19,9 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
+
 public class ServerDataManager {
 
     public static ArrayList<ServerData> serverDataList = new ArrayList<>();
@@ -82,6 +85,16 @@ public class ServerDataManager {
 
     public static boolean isSharedPreferencesEmpty(Context context, String name) {
         return getSharedPreferences(context, name) == null || getSharedPreferences(context, name).getString(name, "").equals("");
+    }
+
+    public static OkHttpClient getAuthenticatorClient(String username, String password) {
+        return new OkHttpClient.Builder()
+                .authenticator((route, resp) -> resp.request().newBuilder()
+                        .header("Authorization", Credentials.basic(username, password))
+                        .build())
+                .followRedirects(false)
+                .followSslRedirects(false)
+                .build();
     }
 
 }

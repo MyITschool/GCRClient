@@ -23,7 +23,6 @@ import com.elseboot3909.GCRClient.databinding.FragmentLoginBinding;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
-import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,6 +39,8 @@ public class LoginFragment extends Fragment {
 
     private String ServerName;
     private String ServerNameEnding;
+    private String Password;
+
 
     private final Handler mHandler = new Handler();
 
@@ -94,10 +95,13 @@ public class LoginFragment extends Fragment {
         // TODO: Check for the internet connection before trying anything
         binding.nextButton.setOnClickListener(view ->
                 mHandler.post(() -> {
+                    binding.nextButton.setClickable(false);
                     binding.progressBar.setVisibility(View.VISIBLE);
 
                     setError(binding.usernameTextField, "");
                     setError(binding.passwordTextField, "");
+
+                    Password = binding.password.getText().toString().trim();
 
                     Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl(ServerName + ServerNameEnding)
@@ -110,20 +114,14 @@ public class LoginFragment extends Fragment {
                     accountInfo.enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                            if (response.isSuccessful()) {
+                            if (response.isSuccessful() || !(response.body() != null && response.body().contains("not found"))) {
                                 Log.e(Constants.LOG_TAG, response.body() != null ? JsonUtils.TrimJson(response.body()) : null);
 
                                 Gson gson = new Gson();
 
                                 String username = gson.fromJson(JsonUtils.TrimJson(response.body()), AccountInfo.class).getUsername();
 
-                                OkHttpClient client = new OkHttpClient.Builder()
-                                        .authenticator((route, resp) -> resp.request().newBuilder()
-                                                .header("Authorization", Credentials.basic(username, binding.password.getText().toString()))
-                                                .build())
-                                        .followRedirects(false)
-                                        .followSslRedirects(false)
-                                        .build();
+                                OkHttpClient client = ServerDataManager.getAuthenticatorClient(username, Password);
 
                                 Retrofit retrofit = new Retrofit.Builder()
                                         .client(client)
@@ -141,12 +139,14 @@ public class LoginFragment extends Fragment {
                                         if (!response.isSuccessful() || (response.body() != null && response.body().contains("Unauthorized"))) {
                                             setError(binding.passwordTextField, getResources().getString(R.string.input_fragment_bad_password));
                                             Log.e(Constants.LOG_TAG, response.toString());
+                                            binding.nextButton.setClickable(true);
                                         } else {
                                             Log.e(Constants.LOG_TAG, response.body() != null ? JsonUtils.TrimJson(response.body()) : null);
                                             OAuthTokenInfo OAuthData = gson.fromJson(JsonUtils.TrimJson(response.body()), OAuthTokenInfo.class);
-                                            ServerDataManager.serverDataList.add(new ServerData(OAuthData.getUsername(), ServerName, ServerNameEnding, OAuthData.getToken()));
+                                            ServerDataManager.serverDataList.add(new ServerData(OAuthData.getUsername(), Password, ServerName, ServerNameEnding, OAuthData.getToken()));
                                             ServerDataManager.writeServerDataList(getContext());
                                             ServerDataManager.writeNewPosition(getContext(), ServerDataManager.serverDataList.size() - 1);
+                                            getActivity().setResult(ServerDataManager.serverDataList.size());
                                             getActivity().finish();
                                         }
                                     }
@@ -156,6 +156,7 @@ public class LoginFragment extends Fragment {
                                         binding.progressBar.setVisibility(View.GONE);
                                         Log.e(Constants.LOG_TAG, t.toString());
                                         setError(binding.passwordTextField, getResources().getString(R.string.input_fragment_bad_password));
+                                        binding.nextButton.setClickable(true);
                                     }
                                 });
 

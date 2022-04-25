@@ -4,14 +4,17 @@ public class ServerData {
 
     private final String Username;
 
+    private final String Password;
+
     private final String ServerName;
 
     private final String ServerNameEnding;
 
     private final String AccessToken;
 
-    public ServerData(String username, String serverName, String serverNameEnding, String accessToken) {
+    public ServerData(String username, String password, String serverName, String serverNameEnding, String accessToken) {
         Username = username;
+        Password = password;
         ServerName = serverName;
         ServerNameEnding = serverNameEnding;
         AccessToken = accessToken;
@@ -22,16 +25,20 @@ public class ServerData {
         return ServerName;
     }
 
+    public String getUsername() {
+        return Username;
+    }
+
+    public String getPassword() {
+        return Password;
+    }
+
     public String getServerName() {
         return ServerName;
     }
 
     public String getServerNameEnding() {
         return ServerNameEnding;
-    }
-
-    public String getAccessToken() {
-        return AccessToken;
     }
 
 }

@@ -1,7 +1,9 @@
 package com.elseboot3909.GCRClient.API;
 
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface AccountAPI {
@@ -11,5 +13,14 @@ public interface AccountAPI {
 
     @GET("a/accounts/self/oauthtoken")
     Call<String> getOAuthToken();
+
+    @GET("a/accounts/self/starred.changes")
+    Call<String> getStarredChanges();
+
+    @PUT("a/accounts/self/starred.changes/{id}")
+    Call<String> putStarredChange(@Path(value = "id", encoded = true) String id);
+
+    @DELETE("a/accounts/self/starred.changes/{id}")
+    Call<String> removeStarredChange(@Path(value = "id", encoded = true) String id);
 
 }

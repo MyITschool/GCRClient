@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         setContentView(R.layout.activity_login);
-        if (ServerDataManager.isSharedPreferencesEmpty(getApplicationContext(), Constants.STORED_TOKENS)) {
+        if (ServerDataManager.serverDataList.isEmpty()) {
             getSupportFragmentManager().beginTransaction().add(R.id.login_container, new HelloLoginFragment()).commit();
         } else {
             getSupportFragmentManager().beginTransaction().add(R.id.login_container, new ServerInputFragment()).commit();

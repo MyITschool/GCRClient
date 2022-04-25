@@ -8,6 +8,6 @@
     android:cacheColorHint="#00000000"
     android:listSelector="@android:color/transparent"
     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-    android:textColor="@color/accent_1_50"
+    android:textColor="?android:textColorPrimary"
     android:ellipsize="end"
     android:maxLines="1"/>

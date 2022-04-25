@@ -75,6 +75,7 @@ public class ServerInputFragment extends Fragment {
         binding.nextButton.setOnClickListener(view -> checkServerName());
         return binding.getRoot();
     }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -87,6 +88,7 @@ public class ServerInputFragment extends Fragment {
     }
 
     private void checkServerName() {
+        binding.nextButton.setClickable(false);
         mHandler.removeCallbacksAndMessages(null);
         mHandler.post(() -> {
             setError(binding.serverNameTextField, "");
@@ -141,12 +143,14 @@ public class ServerInputFragment extends Fragment {
                             setError(binding.serverNameTextField, getResources().getString(R.string.input_fragment_bad_connection));
                         }
                     }
+                    binding.nextButton.setClickable(true);
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
                     binding.progressBar.setVisibility(View.GONE);
                     setError(binding.serverNameTextField, getResources().getString(R.string.input_fragment_bad_connection));
+                    binding.nextButton.setClickable(true);
                 }
             });
         });
