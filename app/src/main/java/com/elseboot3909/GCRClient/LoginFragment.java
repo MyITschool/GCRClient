@@ -114,8 +114,8 @@ public class LoginFragment extends Fragment {
                     accountInfo.enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                            if (response.isSuccessful() || !(response.body() != null && response.body().contains("not found"))) {
-                                Log.e(Constants.LOG_TAG, response.body() != null ? JsonUtils.TrimJson(response.body()) : null);
+                            if (response.isSuccessful() && !(response.body() != null && response.body().contains("not found"))) {
+                                Log.e(Constants.LOG_TAG, response.body() != null ? JsonUtils.TrimJson(response.body()) : "OK!");
 
                                 Gson gson = new Gson();
 
@@ -164,6 +164,7 @@ public class LoginFragment extends Fragment {
                                 Log.e(Constants.LOG_TAG, response.toString());
                                 binding.progressBar.setVisibility(View.GONE);
                                 setError(binding.usernameTextField, getResources().getString(R.string.input_fragment_bad_username));
+                                binding.nextButton.setClickable(true);
                             }
                         }
 
@@ -171,6 +172,7 @@ public class LoginFragment extends Fragment {
                         public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
                             binding.progressBar.setVisibility(View.GONE);
                             setError(binding.usernameTextField, getResources().getString(R.string.input_fragment_bad_username));
+                            binding.nextButton.setClickable(true);
                         }
                     });
                 }));

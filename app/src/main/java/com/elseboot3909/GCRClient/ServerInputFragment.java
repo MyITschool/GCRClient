@@ -97,6 +97,7 @@ public class ServerInputFragment extends Fragment {
                 if (serverData.getServerName().equals(SavedServerName)) {
                     binding.progressBar.setVisibility(View.GONE);
                     setError(binding.serverNameTextField, getResources().getString(R.string.input_fragment_already_logged));
+                    binding.nextButton.setClickable(true);
                     return;
                 }
             }
@@ -105,6 +106,7 @@ public class ServerInputFragment extends Fragment {
                 new URL(SavedServerName);
             } catch (MalformedURLException e) {
                 setError(binding.serverNameTextField, getResources().getString(R.string.input_fragment_bad_server_name));
+                binding.nextButton.setClickable(true);
                 return;
             }
 
