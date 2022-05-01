@@ -19,15 +19,12 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.Credentials;
-import okhttp3.OkHttpClient;
-
 public class ServerDataManager {
 
     public static ArrayList<ServerData> serverDataList = new ArrayList<>();
     public static Integer selectedPos = 0;
 
-    static Gson gson = new Gson();
+    static final Gson gson = new Gson();
 
     public static SharedPreferences getSharedPreferences(Context context, String name) {
         SharedPreferences sharedPreferences = null;
@@ -52,18 +49,21 @@ public class ServerDataManager {
         JsonArray jsonArray = (JsonArray) gson.toJsonTree(serverDataList,
                 new TypeToken<List<ServerData>>() {
                 }.getType());
-        getSharedPreferences(context, Constants.STORED_TOKENS).edit().putString(Constants.STORED_TOKENS, jsonArray.toString()).commit();
+        getSharedPreferences(context, Constants.SERVERS_DATA).edit().putString(Constants.SERVERS_DATA, jsonArray.toString()).commit();
     }
 
     public static void loadServerDataList(Context context) {
-        if (!isSharedPreferencesEmpty(context, Constants.STORED_TOKENS)) {
+        String mValue = Constants.SERVERS_DATA;
+        if (getSharedPreferences(context, mValue) != null && !getSharedPreferences(context, mValue).getString(mValue, "").isEmpty()) {
             try {
-                serverDataList = gson.fromJson(getSharedPreferences(context, Constants.STORED_TOKENS).getString(Constants.STORED_TOKENS, ""),
+                serverDataList = gson.fromJson(getSharedPreferences(context, mValue).getString(mValue, ""),
                         new TypeToken<ArrayList<ServerData>>() {}.getType());
             } catch (JsonSyntaxException ignored) {
                 serverDataList.clear();
-                serverDataList.add(gson.fromJson(getSharedPreferences(context, Constants.STORED_TOKENS).getString(Constants.STORED_TOKENS, ""), ServerData.class));
+                serverDataList.add(gson.fromJson(getSharedPreferences(context, mValue).getString(mValue, ""), ServerData.class));
             }
+        } else {
+            serverDataList = new ArrayList<>();
         }
     }
 
@@ -79,22 +79,6 @@ public class ServerDataManager {
 
     public static void loadSavedPosition(Context context) {
         selectedPos = getSharedPreferences(context, Constants.SELECTED_SERVER).getInt(Constants.SELECTED_SERVER, -1);
-    }
-
-
-
-    public static boolean isSharedPreferencesEmpty(Context context, String name) {
-        return getSharedPreferences(context, name) == null || getSharedPreferences(context, name).getString(name, "").equals("");
-    }
-
-    public static OkHttpClient getAuthenticatorClient(String username, String password) {
-        return new OkHttpClient.Builder()
-                .authenticator((route, resp) -> resp.request().newBuilder()
-                        .header("Authorization", Credentials.basic(username, password))
-                        .build())
-                .followRedirects(false)
-                .followSslRedirects(false)
-                .build();
     }
 
 }

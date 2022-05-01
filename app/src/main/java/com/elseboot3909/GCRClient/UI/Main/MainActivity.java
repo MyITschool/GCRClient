@@ -1,4 +1,4 @@
-package com.elseboot3909.GCRClient;
+package com.elseboot3909.GCRClient.UI.Main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.elseboot3909.GCRClient.Entities.ServerData;
+import com.elseboot3909.GCRClient.UI.Login.LoginActivity;
+import com.elseboot3909.GCRClient.R;
 import com.elseboot3909.GCRClient.Utils.Constants;
 import com.elseboot3909.GCRClient.Utils.ServerDataManager;
 import com.elseboot3909.GCRClient.databinding.ActivityMainBinding;
@@ -25,13 +27,12 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
 
-    ArrayAdapter<ServerData> serverListAdapter;
-    Handler mHandler = new Handler();
-    FragmentTransaction fragmentTransaction;
-    Fragment currentFragment;
-    Fragment searchFragment;
-    String mName;
-    Integer mProgressBarRequests = 0;
+    private final Handler mHandler = new Handler();
+    private FragmentTransaction fragmentTransaction;
+    private Fragment currentFragment;
+    private Fragment searchFragment;
+    private String mName;
+    private Integer mProgressBarRequests = 0;
 
     ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             textView.setText(ServerDataManager.serverDataList.get(ServerDataManager.selectedPos).toString());
         }
 
-        serverListAdapter = new ArrayAdapter<>(this,
+        ArrayAdapter<ServerData> serverListAdapter = new ArrayAdapter<>(this,
                 R.layout.server_list,
                 ServerDataManager.serverDataList);
 

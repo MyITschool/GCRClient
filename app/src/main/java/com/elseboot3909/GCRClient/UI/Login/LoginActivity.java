@@ -1,27 +1,26 @@
-package com.elseboot3909.GCRClient;
+package com.elseboot3909.GCRClient.UI.Login;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.fragment.app.Fragment;
 
-import com.elseboot3909.GCRClient.Utils.Constants;
+import com.elseboot3909.GCRClient.R;
 import com.elseboot3909.GCRClient.Utils.ServerDataManager;
+import com.elseboot3909.GCRClient.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
 
-    Fragment currentFragment;
+    ActivityLoginBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e(Constants.LOG_TAG, "Launching LoginActivity!");
+
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
 
         overridePendingTransition(R.anim.enter_from_right, R.anim.quit_to_left);
-
-        getSupportFragmentManager().addOnBackStackChangedListener(() -> currentFragment = getSupportFragmentManager().findFragmentById(R.id.login_container));
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
@@ -31,16 +30,17 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             getSupportFragmentManager().beginTransaction().add(R.id.login_container, new ServerInputFragment()).commit();
         }
+
+        setContentView(binding.getRoot());
     }
 
     @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            getSupportFragmentManager().popBackStack();
-        } else if (currentFragment instanceof HelloLoginFragment) {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.login_container);
+        if (currentFragment instanceof HelloLoginFragment) {
             moveTaskToBack(true);
-        } else {
-            super.onBackPressed();
+        } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
         }
     }
 

@@ -11,7 +11,7 @@ public class LabelListAdapter extends RecyclerView.Adapter<LabelListAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        LabelsListBinding binding;
+        final LabelsListBinding binding;
 
         public ViewHolder(LabelsListBinding binding) {
             super(binding.getRoot());

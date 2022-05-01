@@ -1,4 +1,4 @@
-package com.elseboot3909.GCRClient;
+package com.elseboot3909.GCRClient.UI.Search;
 
 import android.content.Intent;
 import android.os.Bundle;

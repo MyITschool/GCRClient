@@ -1,4 +1,4 @@
-package com.elseboot3909.GCRClient;
+package com.elseboot3909.GCRClient.UI.Change;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -13,21 +13,18 @@ import androidx.fragment.app.Fragment;
 import com.elseboot3909.GCRClient.API.ChangesAPI;
 import com.elseboot3909.GCRClient.Entities.ChangeInfo;
 import com.elseboot3909.GCRClient.Entities.LabelInfo;
-import com.elseboot3909.GCRClient.Entities.ServerData;
 import com.elseboot3909.GCRClient.Utils.Constants;
 import com.elseboot3909.GCRClient.Utils.JsonUtils;
-import com.elseboot3909.GCRClient.Utils.ServerDataManager;
+import com.elseboot3909.GCRClient.Utils.NetManager;
 import com.elseboot3909.GCRClient.databinding.FragmentVoteBinding;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class VoteFragment extends Fragment {
 
@@ -71,14 +68,7 @@ public class VoteFragment extends Fragment {
         Activity activity = getActivity();
         if (activity != null) ((ChangeActivity) activity).progressBarManager(true);
 
-        ServerData serverData = ServerDataManager.serverDataList.get(ServerDataManager.selectedPos);
-        OkHttpClient client = ServerDataManager.getAuthenticatorClient(serverData.getUsername(), serverData.getPassword());
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .client(client)
-                .baseUrl(serverData.getServerName() + serverData.getServerNameEnding())
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .build();
+        Retrofit retrofit = NetManager.getRetrofitConfiguration(null, true);
 
         ChangesAPI changesAPI = retrofit.create(ChangesAPI.class);
         Call<String> retrofitRequest = changesAPI.getChangeDetails(id);

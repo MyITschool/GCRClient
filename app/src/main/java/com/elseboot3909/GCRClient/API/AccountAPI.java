@@ -11,8 +11,8 @@ public interface AccountAPI {
     @GET("accounts/{user}")
     Call<String> getAccountInfo(@Path("user") String user);
 
-    @GET("a/accounts/self/oauthtoken")
-    Call<String> getOAuthToken();
+    @GET("a/accounts/self/detail")
+    Call<String> getSelfAccountDetails();
 
     @GET("a/accounts/self/starred.changes")
     Call<String> getStarredChanges();

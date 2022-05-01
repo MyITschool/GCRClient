@@ -1,4 +1,4 @@
-package com.elseboot3909.GCRClient;
+package com.elseboot3909.GCRClient.UI.Main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,62 +9,66 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.elseboot3909.GCRClient.API.AccountAPI;
+import com.elseboot3909.GCRClient.API.ChangesAPI;
 import com.elseboot3909.GCRClient.Adapter.ChangePreviewAdapter;
 import com.elseboot3909.GCRClient.Entities.ChangeInfo;
-import com.elseboot3909.GCRClient.Entities.ServerData;
-import com.elseboot3909.GCRClient.Utils.AccountUtils;
+import com.elseboot3909.GCRClient.R;
+import com.elseboot3909.GCRClient.UI.Change.ChangeActivity;
+import com.elseboot3909.GCRClient.UI.Search.SearchActivity;
 import com.elseboot3909.GCRClient.Utils.Constants;
 import com.elseboot3909.GCRClient.Utils.JsonUtils;
-import com.elseboot3909.GCRClient.Utils.ServerDataManager;
-import com.elseboot3909.GCRClient.databinding.ChangesPreviewListBinding;
-import com.elseboot3909.GCRClient.databinding.FragmentStarredListBinding;
+import com.elseboot3909.GCRClient.Utils.NetManager;
+import com.elseboot3909.GCRClient.databinding.FragmentChangesListBinding;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class StarredListFragment extends Fragment {
+public class ChangesListFragment extends Fragment {
 
-    FragmentStarredListBinding binding;
+    FragmentChangesListBinding binding;
     private final ArrayList<ChangeInfo> changesList = new ArrayList<>();
+    private ArrayList<String> queryParams = new ArrayList<>();
     private ChangePreviewAdapter changePreviewAdapter;
     private GestureDetector mGestureDetector;
-    private Integer starredCount;
-    private boolean isLoading = false;
+    private boolean isFrozen = false;
 
-    private final AccountUtils.AccountUtilsCallback accountUtilsCallback = (accountInfo, binding) -> {
-        ChangesPreviewListBinding listBinding = (ChangesPreviewListBinding) binding;
-        listBinding.username.setText(accountInfo.getUsername());
-        int listSize = accountInfo.getAvatars().size();
-        if (listSize != 0) {
-            AccountUtils.setAvatarDrawable(accountInfo.getAvatars().get(listSize - 1), listBinding.profilePic);
-        }
-    };
+    ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Constants.SEARCH_ACQUIRED) {
+                    queryParams.clear();
+                    String search = result.getData().getStringExtra("search_string");
+                    if (!search.isEmpty()) {
+                        queryParams.add(search);
+                        binding.searchBar.setText(search);
+                    } else {
+                        queryParams.add("status:open");
+                        binding.searchBar.setText("");
+                    }
+                    int oldSize = changesList.size();
+                    changesList.clear();
+                    changePreviewAdapter.notifyItemRangeRemoved(0, oldSize);
+                }
+            }
+    );
 
-    private final ChangePreviewAdapter.AdapterCallback adapterCallback = (binding, accountId) -> {
-        binding.profilePic.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), AccountUtils.getRandomAvatar(), null));
-        binding.username.setText(AccountUtils.getRandomUsername());
-        AccountUtils.loadProfileInfo(accountId, binding, accountUtilsCallback);
-    };
-
-    public StarredListFragment() { }
+    public ChangesListFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,22 +78,41 @@ public class StarredListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentStarredListBinding.inflate(inflater, container, false);
+
+        binding = FragmentChangesListBinding.inflate(inflater, container, false);
 
         binding.ctlMenu.setOnClickListener((view) -> {
             DrawerLayout serverNavDL = Objects.requireNonNull(getActivity()).findViewById(R.id.serverNavDL);
             serverNavDL.openDrawer(GravityCompat.START);
         });
 
-        if (starredCount == null) {
-            starredCount = 0;
+        if (queryParams.isEmpty()) {
+            queryParams.add("status:open");
+        }
+        binding.searchBar.setOnClickListener(view -> {
+            Intent intent = new Intent(getActivity(), SearchActivity.class);
+            intent.putExtra("search_string", binding.searchBar.getText().toString().trim());
+            activityResultLauncher.launch(intent);
+        });
+
+        if (changesList.isEmpty()) {
             getChangesList();
         }
-        updateTotalCount(starredCount);
 
-        changePreviewAdapter = new ChangePreviewAdapter(changesList, adapterCallback);
+        changePreviewAdapter = new ChangePreviewAdapter(changesList, this);
         binding.changesView.setAdapter(changePreviewAdapter);
         binding.changesView.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.changesView.setNestedScrollingEnabled(true);
+
+        binding.changesView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (!recyclerView.canScrollVertically(1)){
+                    getChangesList();
+                }
+            }
+        });
 
         mGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
@@ -112,7 +135,7 @@ public class StarredListFragment extends Fragment {
                     intent.putExtra("work_in_progress", changeInfo.getWork_in_progress());
                     startActivity(intent);
                 }
-                return false;
+                return isFrozen;
             }
 
             @Override
@@ -123,11 +146,9 @@ public class StarredListFragment extends Fragment {
         });
 
         binding.refreshChangesView.setOnRefreshListener(() -> {
-            int size = changesList.size();
+            int oldSize = changesList.size();
             changesList.clear();
-            changePreviewAdapter.notifyItemRangeRemoved(0, size);
-            updateTotalCount(0);
-            getChangesList();
+            changePreviewAdapter.notifyItemRangeRemoved(0, oldSize);
             binding.refreshChangesView.setRefreshing(false);
         });
 
@@ -135,24 +156,15 @@ public class StarredListFragment extends Fragment {
     }
 
     private void getChangesList() {
-        if (!isLoading) {
-            isLoading = true;
-        } else {
-            return;
-        }
         ((MainActivity) Objects.requireNonNull(getActivity())).progressBarManager(true);
+        isFrozen = true;
 
-        ServerData serverData = ServerDataManager.serverDataList.get(ServerDataManager.selectedPos);
-        OkHttpClient client = ServerDataManager.getAuthenticatorClient(serverData.getUsername(), serverData.getPassword());
+        int oldSize = changesList.size();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .client(client)
-                .baseUrl(serverData.getServerName() + serverData.getServerNameEnding())
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .build();
+        Retrofit retrofit = NetManager.getRetrofitConfiguration(null, true);
 
-        AccountAPI accountAPI = retrofit.create(AccountAPI.class);
-        Call<String> retrofitRequest = accountAPI.getStarredChanges();
+        ChangesAPI changesAPI = retrofit.create(ChangesAPI.class);
+        Call<String> retrofitRequest = changesAPI.queryChanges(queryParams, 20, oldSize);
 
         retrofitRequest.enqueue(new Callback<String>() {
             @Override
@@ -160,29 +172,24 @@ public class StarredListFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     Gson gson = new Gson();
                     changesList.addAll(gson.fromJson(JsonUtils.TrimJson(response.body()),
-                            new TypeToken<ArrayList<ChangeInfo>>() {}.getType()));
+                            new TypeToken<ArrayList<ChangeInfo>>() {
+                    }.getType()));
                     Log.e(Constants.LOG_TAG, String.valueOf(changesList.size()));
-                    updateTotalCount(changesList.size());
-                    changePreviewAdapter.notifyItemRangeChanged(0, changesList.size());
+                    changePreviewAdapter.notifyItemRangeChanged(oldSize, 20);
                 } else {
                     Log.e(Constants.LOG_TAG, "onResponse: Not successful");
                 }
-                isLoading = false;
                 ((MainActivity) Objects.requireNonNull(getActivity())).progressBarManager(false);
+                isFrozen = false;
             }
 
             @Override
             public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-                isLoading = false;
                 ((MainActivity) Objects.requireNonNull(getActivity())).progressBarManager(false);
+                isFrozen = false;
                 Log.e(Constants.LOG_TAG, "onFailure: Not successful");
             }
         });
-    }
-
-    private void updateTotalCount(int count) {
-        starredCount = count;
-        binding.totalCount.setText(getString(R.string.total_starred_changes, starredCount));
     }
 
 }

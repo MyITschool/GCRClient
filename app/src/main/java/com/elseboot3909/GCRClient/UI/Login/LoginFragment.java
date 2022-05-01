@@ -1,4 +1,4 @@
-package com.elseboot3909.GCRClient;
+package com.elseboot3909.GCRClient.UI.Login;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,33 +14,30 @@ import androidx.fragment.app.Fragment;
 
 import com.elseboot3909.GCRClient.API.AccountAPI;
 import com.elseboot3909.GCRClient.Entities.AccountInfo;
-import com.elseboot3909.GCRClient.Entities.OAuthTokenInfo;
 import com.elseboot3909.GCRClient.Entities.ServerData;
+import com.elseboot3909.GCRClient.R;
 import com.elseboot3909.GCRClient.Utils.Constants;
 import com.elseboot3909.GCRClient.Utils.JsonUtils;
+import com.elseboot3909.GCRClient.Utils.NetManager;
 import com.elseboot3909.GCRClient.Utils.ServerDataManager;
 import com.elseboot3909.GCRClient.databinding.FragmentLoginBinding;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class LoginFragment extends Fragment {
 
     FragmentLoginBinding binding;
 
-    private static final String ARG_SERVER_NAME = "ServerName";
-    private static final String ARG_SERVER_NAME_ENDING = "ServerNameEnding";
-
-    private String ServerName;
-    private String ServerNameEnding;
+    private String serverURL;
+    private String prefixURL;
     private String Password;
 
+    private final Gson gson = new Gson();
 
     private final Handler mHandler = new Handler();
 
@@ -50,8 +47,8 @@ public class LoginFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            ServerName = getArguments().getString(ARG_SERVER_NAME);
-            ServerNameEnding = getArguments().getString(ARG_SERVER_NAME_ENDING);
+            serverURL = getArguments().getString(Constants.ARG_LOGIN_SERVER_URL);
+            prefixURL = getArguments().getString(Constants.ARG_LOGIN_PREFIX_URL);
         }
     }
 
@@ -69,12 +66,10 @@ public class LoginFragment extends Fragment {
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
 
             @Override
-            public void afterTextChanged(Editable editable) {
-            }
+            public void afterTextChanged(Editable editable) { }
         });
 
         binding.password.addTextChangedListener(new TextWatcher() {
@@ -84,12 +79,10 @@ public class LoginFragment extends Fragment {
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
 
             @Override
-            public void afterTextChanged(Editable editable) {
-            }
+            public void afterTextChanged(Editable editable) { }
         });
 
         // TODO: Check for the internet connection before trying anything
@@ -103,10 +96,8 @@ public class LoginFragment extends Fragment {
 
                     Password = binding.password.getText().toString().trim();
 
-                    Retrofit retrofit = new Retrofit.Builder()
-                            .baseUrl(ServerName + ServerNameEnding)
-                            .addConverterFactory(ScalarsConverterFactory.create())
-                            .build();
+                    Log.e(Constants.LOG_TAG, serverURL + " " + prefixURL);
+                    Retrofit retrofit = NetManager.getRetrofitConfiguration(new ServerData(null, null, serverURL, prefixURL), false);
 
                     AccountAPI account = retrofit.create(AccountAPI.class);
                     Call<String> accountInfo = account.getAccountInfo(binding.username.getText().toString().trim());
@@ -117,22 +108,16 @@ public class LoginFragment extends Fragment {
                             if (response.isSuccessful() && !(response.body() != null && response.body().contains("not found"))) {
                                 Log.e(Constants.LOG_TAG, response.body() != null ? JsonUtils.TrimJson(response.body()) : "OK!");
 
-                                Gson gson = new Gson();
+
 
                                 String username = gson.fromJson(JsonUtils.TrimJson(response.body()), AccountInfo.class).getUsername();
 
-                                OkHttpClient client = ServerDataManager.getAuthenticatorClient(username, Password);
-
-                                Retrofit retrofit = new Retrofit.Builder()
-                                        .client(client)
-                                        .baseUrl(ServerName + ServerNameEnding)
-                                        .addConverterFactory(ScalarsConverterFactory.create())
-                                        .build();
+                                Retrofit retrofit = NetManager.getRetrofitConfiguration(new ServerData(username, Password, serverURL, prefixURL), true);
 
                                 AccountAPI account = retrofit.create(AccountAPI.class);
-                                Call<String> oauth = account.getOAuthToken();
+                                Call<String> accountDetails = account.getSelfAccountDetails();
 
-                                oauth.enqueue(new Callback<String>() {
+                                accountDetails.enqueue(new Callback<String>() {
                                     @Override
                                     public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                                         binding.progressBar.setVisibility(View.GONE);
@@ -142,8 +127,8 @@ public class LoginFragment extends Fragment {
                                             binding.nextButton.setClickable(true);
                                         } else {
                                             Log.e(Constants.LOG_TAG, response.body() != null ? JsonUtils.TrimJson(response.body()) : null);
-                                            OAuthTokenInfo OAuthData = gson.fromJson(JsonUtils.TrimJson(response.body()), OAuthTokenInfo.class);
-                                            ServerDataManager.serverDataList.add(new ServerData(OAuthData.getUsername(), Password, ServerName, ServerNameEnding, OAuthData.getToken()));
+                                            AccountInfo accountInfo = gson.fromJson(JsonUtils.TrimJson(response.body()), AccountInfo.class);
+                                            ServerDataManager.serverDataList.add(new ServerData(accountInfo.getUsername(), Password, serverURL, prefixURL));
                                             ServerDataManager.writeServerDataList(getContext());
                                             ServerDataManager.writeNewPosition(getContext(), ServerDataManager.serverDataList.size() - 1);
                                             getActivity().setResult(ServerDataManager.serverDataList.size());

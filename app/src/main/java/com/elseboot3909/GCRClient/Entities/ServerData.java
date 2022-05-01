@@ -1,44 +1,44 @@
 package com.elseboot3909.GCRClient.Entities;
 
+import androidx.annotation.NonNull;
+
 public class ServerData {
 
-    private final String Username;
+    private final String username;
 
-    private final String Password;
+    private final String password;
 
-    private final String ServerName;
+    private final String serverURL;
 
-    private final String ServerNameEnding;
+    private final String prefixURL;
 
-    private final String AccessToken;
-
-    public ServerData(String username, String password, String serverName, String serverNameEnding, String accessToken) {
-        Username = username;
-        Password = password;
-        ServerName = serverName;
-        ServerNameEnding = serverNameEnding;
-        AccessToken = accessToken;
+    public ServerData(String username, String password, String serverURL, String prefixURL) {
+        this.username = username;
+        this.password = password;
+        this.serverURL = serverURL;
+        this.prefixURL = prefixURL;
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return ServerName;
+        return serverURL;
     }
 
     public String getUsername() {
-        return Username;
+        return username;
     }
 
     public String getPassword() {
-        return Password;
+        return password;
     }
 
-    public String getServerName() {
-        return ServerName;
+    public String getServerURL() {
+        return serverURL;
     }
 
-    public String getServerNameEnding() {
-        return ServerNameEnding;
+    public String getURL() {
+        return serverURL + prefixURL;
     }
 
 }

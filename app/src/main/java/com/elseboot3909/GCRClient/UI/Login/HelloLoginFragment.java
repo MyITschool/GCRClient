@@ -1,4 +1,4 @@
-package com.elseboot3909.GCRClient;
+package com.elseboot3909.GCRClient.UI.Login;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.elseboot3909.GCRClient.R;
 import com.elseboot3909.GCRClient.databinding.FragmentHelloLoginBinding;
 
 public class HelloLoginFragment extends Fragment {

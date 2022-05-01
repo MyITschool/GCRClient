@@ -1,4 +1,4 @@
-package com.elseboot3909.GCRClient;
+package com.elseboot3909.GCRClient.UI.Change;
 
 import android.os.Bundle;
 import android.view.View;
@@ -9,16 +9,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.elseboot3909.GCRClient.API.AccountAPI;
-import com.elseboot3909.GCRClient.Entities.ServerData;
-import com.elseboot3909.GCRClient.Utils.ServerDataManager;
+import com.elseboot3909.GCRClient.R;
+import com.elseboot3909.GCRClient.UI.Main.ChangesListFragment;
+import com.elseboot3909.GCRClient.UI.Main.CodeFragment;
+import com.elseboot3909.GCRClient.Utils.NetManager;
 import com.elseboot3909.GCRClient.databinding.ActivityChangeBinding;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ChangeActivity extends AppCompatActivity {
 
@@ -171,14 +171,7 @@ public class ChangeActivity extends AppCompatActivity {
         binding.star.setClickable(false);
         progressBarManager(true);
 
-        ServerData serverData = ServerDataManager.serverDataList.get(ServerDataManager.selectedPos);
-        OkHttpClient client = ServerDataManager.getAuthenticatorClient(serverData.getUsername(), serverData.getPassword());
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .client(client)
-                .baseUrl(serverData.getServerName() + serverData.getServerNameEnding())
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .build();
+        Retrofit retrofit = NetManager.getRetrofitConfiguration(null, true);
 
         AccountAPI accountAPI = retrofit.create(AccountAPI.class);
         Call<String> retrofitRequest;

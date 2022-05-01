@@ -3,7 +3,8 @@
     android:id="@+id/infoChip"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginRight="4dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="4dp"
     android:textAppearance="?attr/textAppearanceLabelMedium"
     android:clickable="false"
     android:ellipsize="end" />
