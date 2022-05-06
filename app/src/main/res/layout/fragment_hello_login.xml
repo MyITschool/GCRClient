@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".UI.Login.HelloLoginFragment">
 
-    <!-- TODO: Move styles to *.xml? -->
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="244dp"

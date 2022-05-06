@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainHidden"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:visibility="gone"
     tools:context=".UI.Change.VoteFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:orientation="vertical" >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/labels"/>
+            android:layout_marginStart="16dp"
+            android:text="@string/labels"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/labelsView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="10dp"
+            android:paddingTop="6dp"
             android:layout_margin="8dp"/>
 
     </LinearLayout>
