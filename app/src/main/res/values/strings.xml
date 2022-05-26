@@ -40,4 +40,6 @@
     <string name="cc">CC</string>
     <string name="labels">Labels</string>
     <string name="topic">Topic</string>
+    <string name="select_server">Select server</string>
+    <string name="title_activity_server">Server</string>
 </resources>

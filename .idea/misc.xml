@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/compose-model-1651936310219.xml" value="0.22550675675675674" />
+        <entry key="../../../../layout/compose-model-1651936325793.xml" value="0.22550675675675674" />
+        <entry key="../../../../layout/compose-model-1651951104377.xml" value="0.1" />
+        <entry key="../../../../layout/compose-model-1651952425217.xml" value="0.164141183152429" />
+        <entry key="../../../../layout/compose-model-1652123479636.xml" value="0.5339943342776204" />
         <entry key="app/src/main/res/drawable-night/ic_baseline_arrow_back.xml" value="0.35260416666666666" />
         <entry key="app/src/main/res/drawable-night/ic_baseline_menu.xml" value="0.35208333333333336" />
         <entry key="app/src/main/res/drawable-night/ic_baseline_menu_24.xml" value="0.35208333333333336" />
@@ -16,17 +21,29 @@
         <entry key="app/src/main/res/drawable/ic_baseline_add.xml" value="0.35208333333333336" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_back.xml" value="0.35260416666666666" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_forward.xml" value="0.35260416666666666" />
+        <entry key="app/src/main/res/drawable/ic_baseline_code.xml" value="0.26875" />
+        <entry key="app/src/main/res/drawable/ic_baseline_comment.xml" value="0.26875" />
         <entry key="app/src/main/res/drawable/ic_baseline_exit.xml" value="0.35208333333333336" />
+        <entry key="app/src/main/res/drawable/ic_baseline_home.xml" value="0.265625" />
+        <entry key="app/src/main/res/drawable/ic_baseline_info.xml" value="0.265625" />
         <entry key="app/src/main/res/drawable/ic_baseline_list.xml" value="0.23489583333333333" />
+        <entry key="app/src/main/res/drawable/ic_baseline_log.xml" value="0.265625" />
         <entry key="app/src/main/res/drawable/ic_baseline_menu.xml" value="0.24479166666666666" />
         <entry key="app/src/main/res/drawable/ic_baseline_menu_24.xml" value="0.24479166666666666" />
+        <entry key="app/src/main/res/drawable/ic_baseline_person.xml" value="0.265625" />
+        <entry key="app/src/main/res/drawable/ic_baseline_star.xml" value="0.265625" />
         <entry key="app/src/main/res/drawable/ic_baseline_switch.xml" value="0.30333333333333334" />
         <entry key="app/src/main/res/drawable/ic_baseline_switch_left.xml" value="0.30333333333333334" />
         <entry key="app/src/main/res/drawable/ic_baseline_switch_right.xml" value="0.30333333333333334" />
+        <entry key="app/src/main/res/drawable/ic_baseline_vote.xml" value="0.26875" />
         <entry key="app/src/main/res/drawable/ic_change_description_background.xml" value="0.22604166666666667" />
         <entry key="app/src/main/res/drawable/ic_change_state_background.xml" value="0.22604166666666667" />
         <entry key="app/src/main/res/drawable/ic_code_selector.xml" value="0.23489583333333333" />
         <entry key="app/src/main/res/drawable/ic_deletions_background.xml" value="0.35260416666666666" />
+        <entry key="app/src/main/res/drawable/ic_dummy_avatar_1.xml" value="0.246875" />
+        <entry key="app/src/main/res/drawable/ic_dummy_avatar_2.xml" value="0.246875" />
+        <entry key="app/src/main/res/drawable/ic_dummy_avatar_3.xml" value="0.246875" />
+        <entry key="app/src/main/res/drawable/ic_dummy_avatar_4.xml" value="0.246875" />
         <entry key="app/src/main/res/drawable/ic_dummy_avatar_5.xml" value="0.35260416666666666" />
         <entry key="app/src/main/res/drawable/ic_home_selector.xml" value="0.35208333333333336" />
         <entry key="app/src/main/res/drawable/ic_info_selector.xml" value="0.23489583333333333" />
@@ -36,20 +53,33 @@
         <entry key="app/src/main/res/drawable/ic_login_background.xml" value="0.19791666666666666" />
         <entry key="app/src/main/res/drawable/ic_nav_view_icon.xml" value="0.35208333333333336" />
         <entry key="app/src/main/res/drawable/ic_navviewicon.xml" value="0.24270833333333333" />
+        <entry key="app/src/main/res/drawable/ic_no_votes.xml" value="0.26875" />
         <entry key="app/src/main/res/drawable/ic_outline_code.xml" value="0.23489583333333333" />
+        <entry key="app/src/main/res/drawable/ic_outline_comment.xml" value="0.265625" />
+        <entry key="app/src/main/res/drawable/ic_outline_home.xml" value="0.265625" />
+        <entry key="app/src/main/res/drawable/ic_outline_info.xml" value="0.265625" />
+        <entry key="app/src/main/res/drawable/ic_outline_person.xml" value="0.265625" />
         <entry key="app/src/main/res/drawable/ic_outline_star.xml" value="0.35260416666666666" />
+        <entry key="app/src/main/res/drawable/ic_outline_vote.xml" value="0.265625" />
         <entry key="app/src/main/res/drawable/ic_person_selector.xml" value="0.35208333333333336" />
         <entry key="app/src/main/res/drawable/ic_search_background.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable/ic_selector_code.xml" value="0.3490740740740741" />
         <entry key="app/src/main/res/drawable/ic_selector_comment.xml" value="0.23489583333333333" />
+        <entry key="app/src/main/res/drawable/ic_selector_home.xml" value="0.265625" />
+        <entry key="app/src/main/res/drawable/ic_selector_info.xml" value="0.265625" />
+        <entry key="app/src/main/res/drawable/ic_selector_person.xml" value="0.265625" />
         <entry key="app/src/main/res/drawable/ic_selector_star.xml" value="0.23489583333333333" />
+        <entry key="app/src/main/res/drawable/ic_selector_vote.xml" value="0.265625" />
         <entry key="app/src/main/res/drawable/ic_star_selector.xml" value="0.35208333333333336" />
+        <entry key="app/src/main/res/drawable/ic_vote_good.xml" value="0.265625" />
         <entry key="app/src/main/res/drawable/ic_vote_selector.xml" value="0.23489583333333333" />
         <entry key="app/src/main/res/drawable/search_background.xml" value="0.24479166666666666" />
-        <entry key="app/src/main/res/layout/activity_change.xml" value="0.5947441217150761" />
+        <entry key="app/src/main/res/layout/activity_change.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.16" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.32382071848254196" />
         <entry key="app/src/main/res/layout/activity_pre_loader.xml" value="0.3223958333333333" />
         <entry key="app/src/main/res/layout/activity_search.xml" value="0.2046875" />
+        <entry key="app/src/main/res/layout/activity_switch_server.xml" value="0.2526041666666667" />
         <entry key="app/src/main/res/layout/change_info_chip.xml" value="0.1636271529888551" />
         <entry key="app/src/main/res/layout/change_info_more_button.xml" value="0.33645833333333336" />
         <entry key="app/src/main/res/layout/change_info_person_chip.xml" value="0.33645833333333336" />
@@ -70,6 +100,7 @@
         <entry key="app/src/main/res/layout/labels_list.xml" value="0.20989583333333334" />
         <entry key="app/src/main/res/layout/server_list.xml" value="0.19265843176992212" />
         <entry key="app/src/main/res/menu/bottom_navigation_change.xml" value="0.21875" />
+        <entry key="app/src/main/res/menu/bottom_navigation_main.xml" value="0.2203125" />
         <entry key="app/src/main/res/menu/bottom_navigation_menu.xml" value="0.21875" />
         <entry key="app/src/main/res/menu/nav_drawer.xml" value="0.3359375" />
         <entry key="app/src/main/res/menu/navigation_drawer.xml" value="0.25" />
