@@ -23,7 +23,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.entity.ChangeInfo
-import com.elseboot3909.gcrclient.model.ChangesViewModel
+import com.elseboot3909.gcrclient.ui.common.ChangesListItem
 import com.elseboot3909.gcrclient.ui.main.search.SearchActivity
 import com.elseboot3909.gcrclient.utils.Constants
 import kotlinx.coroutines.launch
@@ -33,17 +33,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun Changes(drawerState: DrawerState) {
     val context = LocalContext.current
-    val paramsList = remember { mutableStateOf(ArrayList<String>()) }
-    if (paramsList.value.isEmpty()) paramsList.value.add("status:open")
-
-    val model: ChangesViewModel by (context as MainActivity).viewModels()
-    val changesList: ArrayList<ChangeInfo> by model.getChangesList(paramsList.value, 0).observeAsState(ArrayList())
-
     val backgroundColor =
         if (isSystemInDarkTheme()) colorResource(R.color.accent_2_800) else colorResource(R.color.neutral_1_100)
     val scope = rememberCoroutineScope()
+
+    val model: ChangesViewModel by (context as MainActivity).viewModels()
+    val searchModel: SearchParamsViewModel by (context as MainActivity).viewModels()
+    val paramsList: ArrayList<String> by searchModel.getQuery().observeAsState(ArrayList())
+    val changesList: ArrayList<ChangeInfo> by model.getChangesList(paramsList, 0)
+        .observeAsState(ArrayList())
     Scaffold(topBar = {
-        val searchModel: SearchParamsViewModel by (context as MainActivity).viewModels()
         var strSearch by remember { mutableStateOf("") }
         searchModel.getSearchStr().observe(context as MainActivity) { strSearch = it }
         Row(

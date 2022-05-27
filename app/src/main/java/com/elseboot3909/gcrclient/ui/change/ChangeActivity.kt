@@ -148,7 +148,7 @@ class ChangeActivity : AppCompatActivity() {
             },
             bottomBar = {
                 val screensList =
-                    listOf(Screens.Info, Screens.Code, Screens.Vote, Screens.Log, Screens.Comment)
+                    listOf(Screens.Info, Screens.Code, Screens.Vote, Screens.Comment)
                 var selectedItem by remember { mutableStateOf(0) }
                 CompositionLocalProvider(LocalRippleTheme provides NoRippleTheme) {
                     NavigationBar {
@@ -217,9 +217,6 @@ class ChangeActivity : AppCompatActivity() {
                     }
                     composable(route = Screens.Vote.route) {
                         Vote(changeInfo)
-                    }
-                    composable(route = Screens.Log.route) {
-                        Log()
                     }
                     composable(route = Screens.Comment.route) {
                         Comment()

@@ -9,7 +9,7 @@ interface ChangesAPI {
 
     @GET("a/changes/")
     fun queryChanges(
-        @Query(value = "q", encoded = true) q: ArrayList<String>,
+        @Query(value = "q", encoded = true) q: String? = null,
         @Query(value = "o", encoded = true) o: List<String> = listOf(
             "DETAILED_ACCOUNTS",
             "LABELS",
@@ -18,7 +18,7 @@ interface ChangesAPI {
             "DETAILED_LABELS"
         ),
         @Query("n") n: Int = -1,
-        @Query("S") S: Int
+        @Query("S") S: Int = 0
     ): Call<String>
 
     @GET("a/changes/{id}/detail")
@@ -34,6 +34,14 @@ interface ChangesAPI {
     fun getFilesList(
         @Path(value = "id", encoded = true) id: String,
         @Path(value = "revision", encoded = true) revision: String,
+        @Query("base") base: Int? = null
+    ): Call<String>
+
+    @GET("a/changes/{id}/revisions/{revision}/files/{file}/diff")
+    fun getFileDiff(
+        @Path(value = "id", encoded = true) id: String,
+        @Path(value = "revision", encoded = true) revision: String,
+        @Path(value = "file", encoded = true) file: String,
         @Query("base") base: Int? = null
     ): Call<String>
 }

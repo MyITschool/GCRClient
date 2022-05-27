@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.entity.ProjectInfo
+import com.elseboot3909.gcrclient.utils.Constants
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
@@ -37,6 +38,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 @Composable
 fun ProjectsList(navController: NavHostController, searchProjects: ArrayList<String>) {
     val context = LocalContext.current
+    val initProjects = ArrayList(searchProjects)
     var selectedCount by remember { mutableStateOf(searchProjects.size) }
     var searchStr by rememberSaveable { mutableStateOf("") }
     val backgroundColor =
@@ -71,6 +73,12 @@ fun ProjectsList(navController: NavHostController, searchProjects: ArrayList<Str
                     )
                 },
                 onClick = {
+                    (context as SearchActivity).let {
+                        if (initProjects != searchProjects) {
+                            it.intent.putExtra(Constants.SEARCH_PROJECTS_KEY, searchProjects)
+                            it.setResult(Constants.SEARCH_ACQUIRED, it.intent)
+                        }
+                    }
                     navController.popBackStack()
                 }
             )
@@ -86,11 +94,7 @@ fun ProjectsList(navController: NavHostController, searchProjects: ArrayList<Str
                         .filter { n -> n.contains(searchStr) || searchStr.isEmpty() }) { projectName ->
                         val projectInfo = projectsMap[projectName]
                         var isSelected by remember {
-                            mutableStateOf(
-                                searchProjects.contains(
-                                    projectName
-                                )
-                            )
+                            mutableStateOf(searchProjects.contains(projectName))
                         }
                         Card(
                             modifier = Modifier

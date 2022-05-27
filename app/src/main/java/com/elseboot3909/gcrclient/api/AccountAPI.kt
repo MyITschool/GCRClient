@@ -14,9 +14,6 @@ interface AccountAPI {
     @GET("a/accounts/self/detail")
     fun getSelfAccountDetails(): Call<String>
 
-    @GET("a/accounts/self/starred.changes")
-    fun getStarredChanges(): Call<String>
-
     @PUT("a/accounts/self/starred.changes/{id}")
     fun putStarredChange(@Path(value = "id", encoded = true) id: String): Call<String>
 

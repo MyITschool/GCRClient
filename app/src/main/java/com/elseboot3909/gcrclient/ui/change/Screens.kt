@@ -1,7 +1,10 @@
 package com.elseboot3909.gcrclient.ui.change
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.HowToVote
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.HowToVote
@@ -31,13 +34,6 @@ sealed class Screens(
         title = "Vote",
         icon = Icons.Outlined.HowToVote,
         iconPressed = Icons.Filled.HowToVote
-    )
-    object Log : Screens(
-        route = "log_screen",
-        title = "Log",
-        icon = Icons.Default.List,
-        iconPressed = Icons.Default.List
-
     )
     object Comment : Screens(
         route = "comment_screen",

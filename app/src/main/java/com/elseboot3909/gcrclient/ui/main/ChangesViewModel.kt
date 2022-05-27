@@ -1,5 +1,6 @@
-package com.elseboot3909.gcrclient.model
+package com.elseboot3909.gcrclient.ui.main
 
+import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -29,8 +30,13 @@ class ChangesViewModel : ViewModel() {
     private fun loadChangesList(params: ArrayList<String>, offset: Int) {
         val retrofit = NetManager.getRetrofitConfiguration(null, true)
 
-        retrofit.create(ChangesAPI::class.java).queryChanges(q = params, n = 30, S = offset)
-            .enqueue(object : Callback<String> {
+        val request = if (params.isNotEmpty()) {
+            retrofit.create(ChangesAPI::class.java).queryChanges(q = TextUtils.join("+", params), n = 30, S = offset)
+        } else {
+            retrofit.create(ChangesAPI::class.java).queryChanges(n = 30, S = offset)
+        }
+
+        request.enqueue(object : Callback<String> {
                 override fun onResponse(call: Call<String>, response: Response<String>) {
                     if (response.isSuccessful && response.body() != null) {
                         changesList.postValue(
@@ -42,7 +48,7 @@ class ChangesViewModel : ViewModel() {
                     } else {
                         Log.e(
                             "${Constants.LOG_TAG} (${this.javaClass.name})",
-                            "onResponse: Not successful"
+                            "onResponse: Not successful ${response.raw()}"
                         )
                     }
                 }

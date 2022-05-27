@@ -1,8 +1,7 @@
-package com.elseboot3909.gcrclient.ui.main
+package com.elseboot3909.gcrclient.ui.common
 
 import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -13,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -21,9 +19,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.entity.ChangeInfo
 import com.elseboot3909.gcrclient.ui.change.ChangeActivity
+import com.elseboot3909.gcrclient.ui.main.MainActivity
 import com.elseboot3909.gcrclient.utils.AccountUtils
 import com.elseboot3909.gcrclient.utils.DateUtils
 import java.io.Serializable
@@ -111,36 +109,9 @@ fun ChangesListItem(index: Int, item: ChangeInfo) {
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(bottom = 1.dp)
             )
-            Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_insertions_background),
-                    contentDescription = null
-                )
-                Text(
-                    text = changedCountString(item.insertions),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Black,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-            Box {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_deletions_background),
-                    contentDescription = null
-                )
-                Text(
-                    text = changedCountString(item.deletions),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Black,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
+            LinesChangedCount(item.insertions, item.deletions)
         }
     }
-}
-
-private fun changedCountString(value: Int): String {
-    return if (value > 999) "999+" else value.toString()
 }
 
 private fun dateToString(value: String): String {

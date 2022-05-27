@@ -2,6 +2,7 @@ package com.elseboot3909.gcrclient.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -51,7 +52,12 @@ class MainActivity : AppCompatActivity() {
             Constants.ACCOUNT_SWITCHED -> reloadActivity()
             Constants.SEARCH_ACQUIRED -> {
                 val searchModel: SearchParamsViewModel by viewModels()
-                searchModel.setSearchStr(result.data?.getStringExtra(Constants.SEARCH_STRING_KEY) ?: "")
+                result.data?.getStringArrayListExtra(Constants.SEARCH_PROJECTS_KEY)?.let { for (value in it) Log.e(Constants.LOG_TAG, value) }
+                Log.e(Constants.LOG_TAG, result.data?.getStringExtra(Constants.SEARCH_STRING_KEY) ?: "")
+                searchModel.setQuery(
+                    result.data?.getStringExtra(Constants.SEARCH_STRING_KEY) ?: "",
+                    result.data?.getStringArrayListExtra(Constants.SEARCH_PROJECTS_KEY) ?: ArrayList()
+                )
             }
         }
     }
@@ -173,7 +179,13 @@ class MainActivity : AppCompatActivity() {
             drawerState = drawerState,
             drawerContent = {
                 Column {
-                    Column(modifier = Modifier.padding(start = 26.dp, top = 24.dp, bottom = 28.dp)) {
+                    Column(
+                        modifier = Modifier.padding(
+                            start = 26.dp,
+                            top = 24.dp,
+                            bottom = 28.dp
+                        )
+                    ) {
                         Row(modifier = Modifier.padding(bottom = 8.dp)) {
                             Image(
                                 painter = painterResource(R.drawable.ic_nav_view_icon),
@@ -227,7 +239,7 @@ class MainActivity : AppCompatActivity() {
                 }
             },
             content = { NavCtl(drawerState) },
-            scrimColor = Color.Transparent,
+            scrimColor = Color.Transparent
         )
     }
 

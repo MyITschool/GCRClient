@@ -15,6 +15,10 @@
         android:theme="@style/Theme.GCRClient"
         tools:ignore="LockedOrientationActivity">
         <activity
+            android:name=".ui.change.code.FileViewerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.main.search.SearchActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

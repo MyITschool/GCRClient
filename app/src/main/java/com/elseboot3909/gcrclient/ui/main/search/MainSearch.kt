@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,6 +37,7 @@ fun MainSearch(
     searchProjects: ArrayList<String>
 ) {
     var searchStr by rememberSaveable { mutableStateOf(searchParams.strSearch) }
+    val screenWidth = LocalConfiguration.current.screenWidthDp
     val context = LocalContext.current
     val backgroundColor =
         if (isSystemInDarkTheme()) colorResource(R.color.accent_2_800) else colorResource(R.color.neutral_1_100)
@@ -87,6 +89,7 @@ fun MainSearch(
                     Text(text = "Project", style = MaterialTheme.typography.titleMedium)
                     Row(
                         modifier = Modifier
+                            .padding(start = (screenWidth * 0.1).dp)
                             .border(
                                 width = ButtonDefaults.OutlinedBorderSize,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = ButtonDefaults.OutlinedBorderOpacity),
@@ -99,7 +102,7 @@ fun MainSearch(
                             .wrapContentSize()
                     ) {
                         Text(
-                            text = "Select project ${searchProjects.size}",
+                            text = if (searchProjects.size == 0) "Select project" else searchProjects[0],
                             style = MaterialTheme.typography.labelLarge,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

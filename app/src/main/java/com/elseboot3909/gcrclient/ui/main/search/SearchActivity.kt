@@ -42,6 +42,9 @@ class SearchActivity : AppCompatActivity() {
             composable(route = Screens.ProjectsList.route) {
                 ProjectsList(navController, searchProjects)
             }
+            composable(route = Screens.ParamsList.route) {
+                ParamsList(navController, searchProjects)
+            }
         }
     }
 

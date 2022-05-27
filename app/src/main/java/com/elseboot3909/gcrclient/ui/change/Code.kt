@@ -1,8 +1,10 @@
 package com.elseboot3909.gcrclient.ui.change
 
+import android.content.Intent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -26,6 +29,9 @@ import androidx.compose.ui.unit.dp
 import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.entity.ChangeInfo
 import com.elseboot3909.gcrclient.entity.FileInfo
+import com.elseboot3909.gcrclient.ui.change.code.FileViewerActivity
+import com.elseboot3909.gcrclient.ui.common.LinesChangedCount
+import com.elseboot3909.gcrclient.utils.Constants
 
 @ExperimentalAnimationApi
 @ExperimentalMaterial3Api
@@ -152,11 +158,49 @@ fun Code(changeInfo: ChangeInfo) {
             selectedA
         ).observeAsState(HashMap())
         filesList.remove("/COMMIT_MSG")
-        LazyColumn(modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 10.dp)) {
-            filesList.keys.forEach {
+        LazyColumn(modifier = Modifier.padding(top = 4.dp)) {
+            filesList.keys.forEach { file ->
                 item {
-                    Card() {
-                        Text(text = it)
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .defaultMinSize(minHeight = 64.dp)
+                            .wrapContentHeight()
+                            .padding(top = 4.dp, bottom = 2.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                context.let { ctx ->
+                                    val intent = Intent(ctx, FileViewerActivity::class.java)
+                                    intent.let {
+                                        it.putExtra(Constants.FILE_CHANGE_ID_KEY, changeInfo.id)
+                                        it.putExtra(Constants.FILE_PATCHSET_A_KEY, selectedA)
+                                        it.putExtra(Constants.FILE_PATCHSET_B_KEY, revisions[selectedB - 1])
+                                        it.putExtra(Constants.FILE_NAME_KEY, file)
+                                    }
+                                    ctx.startActivity(intent)
+                                }
+                            },
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(start = 6.dp, top = 4.dp, bottom = 4.dp)
+                        ) {
+                            Text(
+                                text = file,
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.width((screenWidth - 62).dp)
+                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                LinesChangedCount(
+                                    filesList[file]?.lines_inserted ?: 0,
+                                    filesList[file]?.lines_deleted ?: 0
+                                )
+                            }
+                        }
                     }
                 }
             }

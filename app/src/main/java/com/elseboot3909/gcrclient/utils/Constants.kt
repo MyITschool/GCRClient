@@ -15,5 +15,11 @@ class Constants {
         const val ACCOUNT_SWITCHED = 2
 
         const val SEARCH_STRING_KEY = "strSearch"
+        const val SEARCH_PROJECTS_KEY = "projectsSearch"
+
+        const val FILE_CHANGE_ID_KEY = "fileChangeID"
+        const val FILE_PATCHSET_A_KEY = "filePatchSetA"
+        const val FILE_PATCHSET_B_KEY = "filePatchSetB"
+        const val FILE_NAME_KEY = "fileName"
     }
 }
