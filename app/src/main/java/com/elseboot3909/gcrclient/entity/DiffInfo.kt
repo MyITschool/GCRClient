@@ -5,4 +5,4 @@ data class DiffInfo(
     val meta_b: DiffFileMetaInfo = DiffFileMetaInfo(),
     val change_type: String = "MODIFIED",
     val content: ArrayList<DiffContent> = ArrayList()
-)
+) : Cloneable

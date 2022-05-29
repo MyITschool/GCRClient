@@ -14,6 +14,8 @@ class Constants {
         const val CHANGE_STATE_CHANGED = 1
         const val ACCOUNT_SWITCHED = 2
 
+        const val MAX_FETCHED_CHANGES = 25
+
         const val SEARCH_STRING_KEY = "strSearch"
         const val SEARCH_PROJECTS_KEY = "projectsSearch"
 

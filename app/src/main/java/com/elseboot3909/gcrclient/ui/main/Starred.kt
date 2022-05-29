@@ -1,5 +1,6 @@
 package com.elseboot3909.gcrclient.ui.main
 
+import android.content.Intent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -21,8 +22,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.entity.ChangeInfo
+import com.elseboot3909.gcrclient.entity.ChangeInfoPreview
+import com.elseboot3909.gcrclient.entity.convertInPreview
+import com.elseboot3909.gcrclient.ui.change.ChangeActivity
 import com.elseboot3909.gcrclient.ui.common.ChangesListItem
 import kotlinx.coroutines.launch
+import java.io.Serializable
 
 @ExperimentalMaterial3Api
 @ExperimentalAnimationApi
@@ -63,14 +68,25 @@ fun Starred(drawerState: DrawerState) {
             val model: StarredViewModel by (context as MainActivity).viewModels()
             val starredList: ArrayList<ChangeInfo> by model.getStarredList()
                 .observeAsState(ArrayList())
+
+            val starredPreviewList = ArrayList<ChangeInfoPreview>()
+            starredList.forEach { item ->
+                starredPreviewList.add(convertInPreview(item))
+            }
+
             Column(modifier = Modifier.padding(top = 6.dp)) {
                 LazyColumn {
-                    itemsIndexed(starredList.map { n -> n }
+                    itemsIndexed(starredPreviewList.map { n -> n }
                         .filter { n ->
                             n.subject.lowercase()
                                 .contains(searchStr.lowercase()) || searchStr.isEmpty()
                         }) { index, item ->
-                        ChangesListItem(index, item)
+                        ChangesListItem(item) {
+                            val intent =
+                                Intent(context as MainActivity, ChangeActivity::class.java)
+                            intent.putExtra("changeInfo", starredList[index] as Serializable)
+                            context.startActivity(intent)
+                        }
                     }
                 }
             }

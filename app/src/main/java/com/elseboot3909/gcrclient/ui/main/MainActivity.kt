@@ -2,13 +2,14 @@ package com.elseboot3909.gcrclient.ui.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,9 +28,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.ui.account.SwitchServer
 import com.elseboot3909.gcrclient.ui.login.LoginActivity
@@ -37,6 +35,9 @@ import com.elseboot3909.gcrclient.ui.theme.MainTheme
 import com.elseboot3909.gcrclient.ui.theme.NoRippleTheme
 import com.elseboot3909.gcrclient.utils.Constants
 import com.elseboot3909.gcrclient.utils.ServerDataManager
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,19 +46,28 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3Api
 class MainActivity : AppCompatActivity() {
 
+    private val searchModel: SearchParamsViewModel by viewModels()
+    private val changesModel: ChangesViewModel by viewModels()
+    private val starredModel: StarredViewModel by viewModels()
+
     val activityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         when (result.resultCode) {
             Constants.ACCOUNT_SWITCHED -> reloadActivity()
             Constants.SEARCH_ACQUIRED -> {
-                val searchModel: SearchParamsViewModel by viewModels()
-                result.data?.getStringArrayListExtra(Constants.SEARCH_PROJECTS_KEY)?.let { for (value in it) Log.e(Constants.LOG_TAG, value) }
-                Log.e(Constants.LOG_TAG, result.data?.getStringExtra(Constants.SEARCH_STRING_KEY) ?: "")
                 searchModel.setQuery(
                     result.data?.getStringExtra(Constants.SEARCH_STRING_KEY) ?: "",
-                    result.data?.getStringArrayListExtra(Constants.SEARCH_PROJECTS_KEY) ?: ArrayList()
+                    result.data?.getStringArrayListExtra(Constants.SEARCH_PROJECTS_KEY)
+                        ?: ArrayList()
                 )
+            }
+            Constants.CHANGE_STATE_CHANGED -> {
+                val query = searchModel.getQuery().value
+                if (query != null) {
+                    changesModel.getChangesList(query, 0)
+                    starredModel.getStarredList()
+                }
             }
         }
     }
@@ -78,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
     @Composable
     private fun NavCtl(drawerState: DrawerState) {
-        val navController = rememberNavController()
+        val navController = rememberAnimatedNavController()
         Scaffold(
             bottomBar = {
                 val screensList =
@@ -98,9 +108,7 @@ class MainActivity : AppCompatActivity() {
                                 selected = selectedItem == index,
                                 onClick = {
                                     selectedItem = index
-                                    navController.navigate(item.route) {
-                                        if (item.route != Screens.Changes.route) popUpTo(route = Screens.Changes.route)
-                                    }
+                                    navController.navigate(item.route)
                                 },
                                 modifier = Modifier.clickable { }
                             )
@@ -110,14 +118,51 @@ class MainActivity : AppCompatActivity() {
             },
         ) { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding)) {
-                NavHost(navController = navController, startDestination = Screens.Changes.route) {
-                    composable(route = Screens.Changes.route) {
+                AnimatedNavHost(
+                    navController = navController,
+                    startDestination = Screens.Changes.route
+                ) {
+                    composable(
+                        route = Screens.Changes.route,
+                        enterTransition = {
+                            slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(175))
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(175))
+                        }) {
                         Changes(drawerState)
                     }
-                    composable(route = Screens.Starred.route) {
+                    composable(route = Screens.Starred.route,
+                        enterTransition = {
+                            when (initialState.destination.route) {
+                                Screens.Changes.route -> {
+                                    slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(175))
+                                }
+                                else -> {
+                                    slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(175))
+                                }
+                            }
+                        },
+                        exitTransition = {
+                            when (initialState.destination.route) {
+                                Screens.Changes.route -> {
+                                    slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(175))
+                                }
+                                else -> {
+                                    slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(175))
+                                }
+                            }
+                        }) {
                         Starred(drawerState)
                     }
-                    composable(route = Screens.Profile.route) {
+                    composable(
+                        route = Screens.Profile.route,
+                        enterTransition = {
+                            slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(175))
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(175))
+                        }) {
                         Profile(drawerState)
                     }
                 }

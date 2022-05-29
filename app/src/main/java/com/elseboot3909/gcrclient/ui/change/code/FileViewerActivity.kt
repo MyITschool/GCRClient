@@ -16,8 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -25,7 +23,8 @@ import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.entity.DiffInfo
 import com.elseboot3909.gcrclient.ui.theme.MainTheme
 import com.elseboot3909.gcrclient.utils.Constants
-import java.lang.Integer.max
+import com.google.gson.Gson
+import kotlin.math.max
 
 class FileViewerActivity : AppCompatActivity() {
 
@@ -45,16 +44,19 @@ class FileViewerActivity : AppCompatActivity() {
         intent.getStringExtra(Constants.FILE_CHANGE_ID_KEY) ?: ""
     }
 
-    private var maxSize: Int = 0
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         overridePendingTransition(R.anim.enter_from_right, R.anim.quit_to_left)
 
         setContent {
             MainTheme {
-                FileViewer()
+                Box(
+                    modifier = Modifier
+                        .background(color = Color(0xFF303030))
+                        .fillMaxSize()
+                ) {
+                    FileViewer()
+                }
             }
         }
     }
@@ -62,94 +64,134 @@ class FileViewerActivity : AppCompatActivity() {
     @Composable
     private fun FileViewer() {
         val model: FileDiffViewModel by viewModels()
-        val diffInfo: DiffInfo by model.getDiffInfo(
+        val oldDiffInfo: DiffInfo by model.getDiffInfo(
             id = revisionId,
             base = patchsetA,
             file = fileName,
             revision = patchsetB
         ).observeAsState(DiffInfo())
-        val lineOffset = ArrayList<LineOffset>()
-        val ifWrapped = ArrayList<MutableState<Boolean>>()
-        lineOffset.add(LineOffset())
+        val diffInfo = Gson().fromJson(Gson().toJson(oldDiffInfo), DiffInfo::class.java)
+        val maxSize = max(diffInfo.meta_a.lines, diffInfo.meta_b.lines).toString().length
+        val parsedContent = ArrayList<ParsedPart>()
+        var offsetA = 0
+        var offsetB = 0
         diffInfo.content.forEachIndexed { part, content ->
+            val parsedLinesBefore = ArrayList<ParsedLine>()
+            val parsedLinesWrapped = ArrayList<ParsedLine>()
+            val parsedLinesAfter = ArrayList<ParsedLine>()
             content.ab.forEachIndexed { i, line ->
-                content.ab[i] = line.replace(' ', '\u00A0')
-            }
-            content.a.forEachIndexed { i, line ->
-                content.a[i] = line.replace(' ', '\u00A0')
-            }
-            content.b.forEachIndexed { i, line ->
-                content.b[i] = line.replace(' ', '\u00A0')
-            }
-            lineOffset.add(
-                LineOffset(
-                    content.ab.size + content.a.size + lineOffset[part].offsetA,
-                    content.ab.size + content.b.size + lineOffset[part].offsetB
+                offsetA++; offsetB++
+                val currentLine = ParsedLine(
+                    countA = offsetA.toString(),
+                    offsetA = "0".repeat(maxSize - offsetA.toString().length),
+                    countB = offsetB.toString(),
+                    offsetB = "0".repeat(maxSize - offsetB.toString().length),
+                    text = line.replace(' ', '\u00A0')
                 )
-            )
-            ifWrapped.add(remember { mutableStateOf(content.ab.size > 25) })
+                if (content.ab.size > 25) {
+                    if (i <= 10 && part != 0) {
+                        parsedLinesBefore.add(currentLine)
+                    } else if (i >= content.ab.size - 10 && diffInfo.content.size - 1 != part) {
+                        parsedLinesAfter.add(currentLine)
+                    } else {
+                        parsedLinesWrapped.add(currentLine)
+                    }
+                } else {
+                    parsedLinesAfter.add(currentLine)
+                }
+            }
+            val parsedLinesA = ArrayList<ParsedLine>()
+            content.a.forEach {
+                offsetA++
+                parsedLinesA.add(
+                    ParsedLine(
+                        countA = offsetA.toString(),
+                        offsetA = "0".repeat(maxSize - offsetA.toString().length),
+                        offsetB = "0".repeat(maxSize),
+                        text = it.replace(' ', '\u00A0')
+                    )
+                )
+            }
+            val parsedLinesB = ArrayList<ParsedLine>()
+            content.b.forEach {
+                offsetB++
+                parsedLinesB.add(
+                    ParsedLine(
+                        offsetA = "0".repeat(maxSize),
+                        countB = offsetB.toString(),
+                        offsetB = "0".repeat(maxSize - offsetB.toString().length),
+                        text = it.replace(' ', '\u00A0')
+                    )
+                )
+            }
+            if (parsedLinesBefore.isNotEmpty()) {
+                parsedContent.add(
+                    ParsedPart(
+                        backgroundColor = Color(0xFF303030),
+                        content = parsedLinesBefore,
+                        isWrapped = remember { mutableStateOf(false) })
+                )
+            }
+            if (parsedLinesWrapped.isNotEmpty()) {
+                parsedContent.add(
+                    ParsedPart(
+                        backgroundColor = Color(0xFF303030),
+                        content = parsedLinesWrapped,
+                        isWrapped = remember { mutableStateOf(true) },
+                        wrappedText = "Expand ${parsedLinesWrapped.size} lines"
+                    )
+                )
+            }
+            if (parsedLinesAfter.isNotEmpty()) {
+                parsedContent.add(
+                    ParsedPart(
+                        backgroundColor = Color(0xFF303030),
+                        content = parsedLinesAfter,
+                        isWrapped = remember { mutableStateOf(false) })
+                )
+            }
+            if (parsedLinesA.isNotEmpty()) {
+                parsedContent.add(
+                    ParsedPart(
+                        backgroundColor = Color(0xFFFFB0B0),
+                        textColor = Color(0xFF414141),
+                        content = parsedLinesA,
+                        isWrapped = remember { mutableStateOf(false) })
+                )
+            }
+            if (parsedLinesB.isNotEmpty()) {
+                parsedContent.add(
+                    ParsedPart(
+                        backgroundColor = Color(0xFFE3F7EA),
+                        textColor = Color(0xFF414141),
+                        content = parsedLinesB,
+                        isWrapped = remember { mutableStateOf(false) })
+                )
+            }
         }
-        maxSize = max(diffInfo.meta_a.lines, diffInfo.meta_b.lines).toString().length
+
         Column {
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                diffInfo.content.forEachIndexed { part, content ->
-                    if (ifWrapped[part].value) {
-                        if (part != 0) {
-                            for (i in 0..10) {
-                                item {
-                                    LineText(
-                                        countA = "${i + 1 + lineOffset[part].offsetA}",
-                                        countB = "${i + 1 + lineOffset[part].offsetB}",
-                                        line = content.ab[i]
-                                    )
-                                }
-                            }
-                        }
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                parsedContent.forEach {
+                    if (it.isWrapped.value) {
                         item {
-                            Button(onClick = { ifWrapped[part].value = false }, modifier = Modifier.fillMaxWidth().padding(start = 2.dp, end = 2.dp), shape = RoundedCornerShape(4.dp)) {
-                                Text(text = "Expand ${content.ab.size - 20} lines")
-                            }
-                        }
-                        if (part + 1 != diffInfo.content.size) {
-                            for (i in content.ab.size - 10 until content.ab.size) {
-                                item {
-                                    LineText(
-                                        countA = "${i + 1 + lineOffset[part].offsetA}",
-                                        countB = "${i + 1 + lineOffset[part].offsetB}",
-                                        line = content.ab[i]
-                                    )
-                                }
+                            Button(
+                                onClick = { it.isWrapped.value = false },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 2.dp, end = 2.dp),
+                                shape = RoundedCornerShape(0.dp)
+                            ) {
+                                Text(text = it.wrappedText)
                             }
                         }
                     } else {
-                        content.ab.forEachIndexed { i, line ->
+                        it.content.forEach { line ->
                             item {
-                                LineText(
-                                    countA = "${i + 1 + lineOffset[part].offsetA}",
-                                    countB = "${i + 1 + lineOffset[part].offsetB}",
-                                    line = line
-                                )
+                                LineText(line, it.backgroundColor, it.textColor)
                             }
-                        }
-                    }
-                    content.a.forEachIndexed { i, line ->
-                        item {
-                            LineText(
-                                countA = "${i + 1 + content.ab.size + lineOffset[part].offsetA}",
-                                countB = "",
-                                line = line,
-                                background = Color(0xFFFFB0B0)
-                            )
-                        }
-                    }
-                    content.b.forEachIndexed { i, line ->
-                        item {
-                            LineText(
-                                countA = "",
-                                countB = "${i + 1 + content.ab.size + lineOffset[part].offsetB}",
-                                line = line,
-                                background = Color(0xFFE3F7EA)
-                            )
                         }
                     }
                 }
@@ -158,58 +200,57 @@ class FileViewerActivity : AppCompatActivity() {
     }
 
     @Composable
-    private fun LineText(
-        countA: String = "",
-        countB: String = "",
-        line: String = "",
-        background: Color = Color.Transparent
-    ) {
+    private fun LineText(parsedLine: ParsedLine, backgroundColor: Color, textColor: Color) {
         Row(
             Modifier
                 .height(IntrinsicSize.Min)
-                .background(color = background)
+                .background(color = backgroundColor)
         ) {
-            Row(modifier = Modifier.background(color = colorResource(R.color.neutral_1_50))) {
-                listOf(countA, countB).forEach {
-                    Divider(
-                        color = Color.Transparent,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(2.dp)
-                    )
-                    Text(
-                        buildAnnotatedString {
-                            withStyle(
-                                style = SpanStyle(
-                                    color = Color(0xFF21005D)
-                                )
-                            ) {
-                                append(it)
-                            }
-                            withStyle(
-                                style = SpanStyle(
-                                    color = MaterialTheme.colorScheme.onBackground.copy(
-                                        alpha = 0.0f
-                                    )
-                                )
-                            ) {
-                                append("0".repeat(maxSize - it.length))
-                            }
-                        }
-                    )
-                    Divider(
-                        color = Color.Black,
-                        modifier = Modifier
-                            .padding(start = 2.dp)
-                            .fillMaxHeight()
-                            .width(1.dp)
-                    )
-                }
+            Row(modifier = Modifier.background(color = Color(0xFF545454))) {
+                LineCounter(parsedLine.countA, parsedLine.offsetA)
+                LineCounter(parsedLine.countB, parsedLine.offsetB)
             }
             Row(modifier = Modifier.padding(start = 3.dp)) {
-                Text(text = line, modifier = Modifier.fillMaxWidth())
+                Text(
+                    text = parsedLine.text,
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
+                )
             }
         }
+    }
+
+    @Composable
+    private fun LineCounter(count: String, offset: String) {
+        Divider(
+            color = Color.Transparent,
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(2.dp)
+        )
+        Text(
+            buildAnnotatedString {
+                withStyle(
+                    style = MaterialTheme.typography.bodyMedium.toSpanStyle()
+                        .copy(color = Color(0xFF272727))
+                ) {
+                    append(count)
+                }
+                withStyle(
+                    style = MaterialTheme.typography.bodyMedium.toSpanStyle()
+                        .copy(color = Color.Transparent)
+                ) {
+                    append(offset)
+                }
+            }
+        )
+        Divider(
+            color = Color.Black.copy(alpha = 0.8f),
+            modifier = Modifier
+                .padding(start = 2.dp)
+                .fillMaxHeight()
+                .width(1.dp)
+        )
     }
 
     override fun finish() {
@@ -218,4 +259,18 @@ class FileViewerActivity : AppCompatActivity() {
     }
 }
 
-data class LineOffset(val offsetA: Int = 0, val offsetB: Int = 0)
+data class ParsedLine(
+    val countA: String = "",
+    val offsetA: String = "",
+    val countB: String = "",
+    val offsetB: String = "",
+    val text: String = ""
+)
+
+data class ParsedPart(
+    val backgroundColor: Color = Color.Transparent,
+    val textColor: Color = Color(0xFFA4A7AC),
+    val content: ArrayList<ParsedLine> = ArrayList(),
+    val isWrapped: MutableState<Boolean>,
+    val wrappedText: String = ""
+)

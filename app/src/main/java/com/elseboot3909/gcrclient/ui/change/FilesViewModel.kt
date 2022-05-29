@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.elseboot3909.gcrclient.api.ChangesAPI
 import com.elseboot3909.gcrclient.entity.FileInfo
-import com.elseboot3909.gcrclient.utils.Constants
+import com.elseboot3909.gcrclient.ui.common.ProgressBarInterface
 import com.elseboot3909.gcrclient.utils.JsonUtils
 import com.elseboot3909.gcrclient.utils.NetManager
 import com.google.gson.Gson
@@ -14,11 +14,14 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class FilesViewModel : ViewModel() {
+class FilesViewModel : ViewModel(), ProgressBarInterface {
 
     private var _id: MutableLiveData<String> = MutableLiveData("")
     private var _revision: MutableLiveData<String> = MutableLiveData("")
     private var _base: MutableLiveData<Int> = MutableLiveData(0)
+
+    override var requests = 0
+    override var isRunning: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private val filesList: MutableLiveData<HashMap<String, FileInfo>> by lazy {
         MutableLiveData<HashMap<String, FileInfo>>()
@@ -35,6 +38,7 @@ class FilesViewModel : ViewModel() {
     }
 
     private fun loadFilesList(id: String, revision: String, base: Int) {
+        request()
         val retrofit = NetManager.getRetrofitConfiguration(null, true)
 
         val request = if (base == 0) {
@@ -51,14 +55,12 @@ class FilesViewModel : ViewModel() {
                             object : TypeToken<HashMap<String, FileInfo>>() {}.type
                         )
                     )
-                    android.util.Log.e(Constants.LOG_TAG, "onResponse: Good" + response.body())
-                } else {
-                    android.util.Log.e(Constants.LOG_TAG, "onResponse: Bad" + response.body())
                 }
+                release()
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                android.util.Log.e(Constants.LOG_TAG, "onFailure: Bad")
+                release()
             }
         })
     }

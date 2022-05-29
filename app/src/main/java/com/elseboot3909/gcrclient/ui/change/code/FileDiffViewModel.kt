@@ -20,9 +20,16 @@ class FileDiffViewModel : ViewModel() {
     private val diffInfo: MutableLiveData<DiffInfo> by lazy {
         MutableLiveData<DiffInfo>()
     }
+    private val _file: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
 
     fun getDiffInfo(id: String, revision: String, base: Int, file: String): LiveData<DiffInfo> {
-        loadDiffInfo(id, revision, base, file)
+        if (_file.value != file ) {
+            _file.value = file
+            loadDiffInfo(id, revision, base, file)
+        }
         return diffInfo
     }
 

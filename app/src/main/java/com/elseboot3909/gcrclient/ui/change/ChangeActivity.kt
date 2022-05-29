@@ -1,6 +1,7 @@
 package com.elseboot3909.gcrclient.ui.change
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedContentScope
@@ -29,6 +30,7 @@ import com.elseboot3909.gcrclient.api.AccountAPI
 import com.elseboot3909.gcrclient.entity.ChangeInfo
 import com.elseboot3909.gcrclient.ui.theme.MainTheme
 import com.elseboot3909.gcrclient.ui.theme.NoRippleTheme
+import com.elseboot3909.gcrclient.utils.Constants
 import com.elseboot3909.gcrclient.utils.NetManager
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -105,25 +107,25 @@ class ChangeActivity : AppCompatActivity() {
                             }
                             var isStarred by remember { mutableStateOf(changeInfo.starred) }
                             IconButton(onClick = {
+                                setResult(Constants.CHANGE_STATE_CHANGED)
                                 val retrofit = NetManager.getRetrofitConfiguration(null, true)
-
                                 val accountAPI = retrofit.create(AccountAPI::class.java)
                                 val request: Call<String> =
-                                    if (isStarred) accountAPI.removeStarredChange(changeInfo.id) else accountAPI.putStarredChange(
-                                        changeInfo.id
-                                    )
-
+                                    if (isStarred) accountAPI.removeStarredChange(changeInfo.id) else accountAPI.putStarredChange(changeInfo.id)
+                                val msg = if (isStarred) "Removed from starred" else "Set to starred"
                                 request.enqueue(object : Callback<String> {
                                     override fun onResponse(
                                         call: Call<String>,
                                         response: Response<String>
                                     ) {
-                                        if (response.isSuccessful) isStarred = !isStarred
+                                        if (response.isSuccessful) {
+                                            isStarred = !isStarred
+                                            Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show()
+                                        }
                                     }
 
                                     override fun onFailure(call: Call<String>, t: Throwable) {
                                     }
-
                                 })
                             }) {
                                 Icon(

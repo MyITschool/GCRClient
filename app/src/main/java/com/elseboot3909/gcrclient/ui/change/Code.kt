@@ -31,6 +31,7 @@ import com.elseboot3909.gcrclient.entity.ChangeInfo
 import com.elseboot3909.gcrclient.entity.FileInfo
 import com.elseboot3909.gcrclient.ui.change.code.FileViewerActivity
 import com.elseboot3909.gcrclient.ui.common.LinesChangedCount
+import com.elseboot3909.gcrclient.ui.common.changedCountString
 import com.elseboot3909.gcrclient.utils.Constants
 
 @ExperimentalAnimationApi
@@ -41,6 +42,9 @@ fun Code(changeInfo: ChangeInfo) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val buttonColor =
         if (isSystemInDarkTheme()) colorResource(R.color.accent_1_700) else colorResource(R.color.neutral_1_100)
+    val model: FilesViewModel by (context as ChangeActivity).viewModels()
+    val showProgress: Boolean by model.getStatus().observeAsState(false)
+    if (showProgress) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
     Column(modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 8.dp)) {
         val revisions =
             changeInfo.revisions.keys.sortedWith(compareBy { changeInfo.revisions[it]?._number })
@@ -151,7 +155,7 @@ fun Code(changeInfo: ChangeInfo) {
                 }
             }
         }
-        val model: FilesViewModel by (context as ChangeActivity).viewModels()
+
         val filesList: HashMap<String, FileInfo> by model.getFilesList(
             changeInfo.id,
             revisions[selectedB - 1],
@@ -196,8 +200,8 @@ fun Code(changeInfo: ChangeInfo) {
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 LinesChangedCount(
-                                    filesList[file]?.lines_inserted ?: 0,
-                                    filesList[file]?.lines_deleted ?: 0
+                                    changedCountString(filesList[file]?.lines_inserted ?: 0),
+                                    changedCountString(filesList[file]?.lines_deleted ?: 0)
                                 )
                             }
                         }

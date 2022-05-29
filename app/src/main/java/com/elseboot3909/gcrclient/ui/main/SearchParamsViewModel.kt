@@ -16,7 +16,7 @@ class SearchParamsViewModel : ViewModel() {
     }
 
     private val _queryList by lazy {
-        MutableLiveData(ArrayList<String>())
+        MutableLiveData("")
     }
 
     fun setQuery(searchStr: String, searchProjects: ArrayList<String>) {
@@ -25,10 +25,10 @@ class SearchParamsViewModel : ViewModel() {
         val queryList = ArrayList<String>()
         if (searchProjects.size != 0) queryList.add(TextUtils.join(" OR ", searchProjects.map { project -> "project:$project" }))
         if (searchStr.isNotEmpty()) queryList.add(searchStr)
-        _queryList.postValue(queryList)
+        _queryList.postValue(TextUtils.join("+", queryList))
     }
 
-    fun getQuery(): LiveData<ArrayList<String>> {
+    fun getQuery(): LiveData<String> {
         return _queryList
     }
 
