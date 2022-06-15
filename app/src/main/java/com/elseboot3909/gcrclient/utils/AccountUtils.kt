@@ -1,7 +1,7 @@
 package com.elseboot3909.gcrclient.utils
 
 import com.elseboot3909.gcrclient.R
-import com.elseboot3909.gcrclient.entity.AccountInfo
+import com.elseboot3909.gcrclient.entity.external.AccountInfo
 import java.util.*
 
 class AccountUtils {
@@ -20,6 +20,10 @@ class AccountUtils {
 
         fun getRandomAvatar(): Int {
             return dummyAvatars[random.nextInt(dummyAvatars.size)]
+        }
+
+        fun getAvatarById(id: Int): Int {
+            return dummyAvatars[id % dummyAvatars.size]
         }
 
         fun getShowedName(account: AccountInfo): String {

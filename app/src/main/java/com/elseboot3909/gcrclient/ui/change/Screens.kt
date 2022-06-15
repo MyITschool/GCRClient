@@ -11,7 +11,7 @@ import androidx.compose.material.icons.outlined.HowToVote
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class Screens(
+internal sealed class Screens(
     val route: String,
     val title: String,
     val icon: ImageVector,
