@@ -21,7 +21,7 @@ import com.elseboot3909.gcrclient.remote.api.ConfigAPI
 import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.ui.login.Screens
 import com.elseboot3909.gcrclient.utils.Constants
-import com.elseboot3909.gcrclient.viewmodel.credentials.CredentialsViewModel
+import com.elseboot3909.gcrclient.viewmodel.CredentialsViewModel
 import io.ktor.client.call.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
@@ -30,10 +30,9 @@ import java.net.URL
 @Composable
 internal fun ServerInput(
     navController: NavController,
-    credentialsViewModel: CredentialsViewModel = getViewModel()
+    credentialsViewModel: CredentialsViewModel = getViewModel(owner = LocalContext.current as MasterActivity)
 ) {
     val scope = rememberCoroutineScope()
-    val activity = LocalContext.current as MasterActivity
     val serversList = credentialsViewModel.serversList.observeAsState()
     val finalServersList: List<ServerData> = serversList.value?.serverDataList?.mapNotNull { it } ?: ArrayList()
     val screenHeight = LocalConfiguration.current.screenHeightDp

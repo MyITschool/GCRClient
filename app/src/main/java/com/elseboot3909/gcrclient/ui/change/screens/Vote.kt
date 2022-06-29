@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+
 package com.elseboot3909.gcrclient.ui.change.screens
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -9,31 +12,30 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults.OutlinedBorderSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.elseboot3909.gcrclient.entity.external.ChangeInfo
+import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.ui.MasterScreens
-import com.elseboot3909.gcrclient.viewmodel.change.ChangeInfoRepository
-import org.koin.androidx.compose.get
+import com.elseboot3909.gcrclient.viewmodel.ChangeInfoViewModel
+import org.koin.androidx.compose.getViewModel
 import kotlin.math.abs
 
 @Composable
 internal fun Vote(
     masterNavCtl: NavController,
-    changeInfoRepo: ChangeInfoRepository = get()
+    ciViewModel: ChangeInfoViewModel = getViewModel(owner = LocalContext.current as MasterActivity)
 ) {
-    val changeInfo: ChangeInfo by changeInfoRepo.changeInfo.collectAsState()
+    val changeInfo: ChangeInfo by ciViewModel.changeInfo.observeAsState(ChangeInfo())
     val labels = changeInfo.labels
     val labelList = ArrayList<LabelPreview>()
     for (label in labels.keys) {

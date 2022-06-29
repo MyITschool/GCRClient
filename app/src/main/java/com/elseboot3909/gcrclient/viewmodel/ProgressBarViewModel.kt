@@ -1,9 +1,9 @@
-package com.elseboot3909.gcrclient.viewmodel.progress
+package com.elseboot3909.gcrclient.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elseboot3909.gcrclient.repository.progress.ProgressBarRepository
+import com.elseboot3909.gcrclient.repository.ProgressBarRepository
 import kotlinx.coroutines.launch
 
 class ProgressBarViewModel(progressBarRepository: ProgressBarRepository) : ViewModel() {

@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elseboot3909.gcrclient.entity.external.AccountInfo
 import com.elseboot3909.gcrclient.remote.api.AccountAPI
+import com.elseboot3909.gcrclient.repository.ProgressBarRepository
 import com.elseboot3909.gcrclient.utils.JsonUtils
-import com.elseboot3909.gcrclient.repository.progress.ProgressBarRepository
-import io.ktor.client.call.*
+import io.ktor.client.call.body
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 

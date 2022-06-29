@@ -96,7 +96,7 @@ private fun VoteScreenNavCtl(label: String) {
                 slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
             }
         ) {
-            VoteActions(label, navController)
+            VoteActions.VoteActions(label, navController)
         }
     }
 }

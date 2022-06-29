@@ -9,8 +9,8 @@ import com.elseboot3909.gcrclient.remote.api.ChangesAPI
 import com.elseboot3909.gcrclient.utils.Constants
 import com.elseboot3909.gcrclient.utils.JsonUtils.json
 import com.elseboot3909.gcrclient.utils.JsonUtils.trimJson
-import com.elseboot3909.gcrclient.repository.progress.ProgressBarRepository
-import com.elseboot3909.gcrclient.repository.search.SearchParamsRepository
+import com.elseboot3909.gcrclient.repository.ProgressBarRepository
+import com.elseboot3909.gcrclient.repository.SearchParamsRepository
 import io.ktor.client.call.*
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch

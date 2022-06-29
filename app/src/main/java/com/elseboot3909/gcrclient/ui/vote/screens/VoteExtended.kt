@@ -18,8 +18,8 @@ import androidx.compose.material.icons.filled.HowToVote
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,22 +43,24 @@ import com.elseboot3909.gcrclient.ui.theme.voteBoxBorder
 import com.elseboot3909.gcrclient.ui.theme.voteBoxGoodColor
 import com.elseboot3909.gcrclient.ui.theme.voteBoxNeutralColor
 import com.elseboot3909.gcrclient.ui.vote.Screens
-import com.elseboot3909.gcrclient.utils.AccountUtils.Companion.getAvatarById
-import com.elseboot3909.gcrclient.utils.AccountUtils.Companion.getShowedName
-import com.elseboot3909.gcrclient.viewmodel.change.ChangeInfoRepository
-import com.elseboot3909.gcrclient.repository.progress.ProgressBarRepository
+import com.elseboot3909.gcrclient.repository.ChangeInfoRepository
+import com.elseboot3909.gcrclient.repository.ProgressBarRepository
+import com.elseboot3909.gcrclient.utils.AccountUtils
+import com.elseboot3909.gcrclient.viewmodel.ChangeInfoViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 internal fun VoteExtended(
     label: String,
     navController: NavHostController,
-    changeInfoRepo: ChangeInfoRepository = get(),
-    progressBarRepository: ProgressBarRepository = get()
+    pbRepo: ProgressBarRepository = get(),
+    ciRepo: ChangeInfoRepository = get(),
+    ciViewModel: ChangeInfoViewModel = getViewModel(owner = LocalContext.current as MasterActivity)
 ) {
-    val changeInfo: ChangeInfo by changeInfoRepo.changeInfo.collectAsState()
+    val changeInfo: ChangeInfo by ciViewModel.changeInfo.observeAsState(ChangeInfo())
     if (changeInfo.id.isEmpty()) return
     val removableList = changeInfo.removable_reviewers.map { n -> n._account_id }
     val scope = rememberCoroutineScope()
@@ -70,27 +72,27 @@ internal fun VoteExtended(
                 icon = { Icon(imageVector = Icons.Default.HowToVote, contentDescription = null) },
                 onClick = {
                     scope.launch {
-                        progressBarRepository.acquire()
+                        pbRepo.acquire()
                         var response =
                             ChangesAPI.getReviewer(changeInfo, AccountInfo(username = "self"))
-                        progressBarRepository.release()
+                        pbRepo.release()
                         if (response.status.value in 200..299) {
                             navController.navigate(route = Screens.VoteActions.route)
                         } else {
                             buildAddReviewerDialog(activity) {
                                 scope.launch {
-                                    progressBarRepository.acquire()
+                                    pbRepo.acquire()
                                     response = ChangesAPI.addReviewer(
                                         changeInfo,
                                         ReviewerInput(reviewer = "self")
                                     )
                                     if (response.status.value in 200..299) {
-                                        changeInfoRepo.syncChangeWithRemote()
+                                        ciRepo.syncChangeWithRemote()
                                         navController.navigate(route = Screens.VoteActions.route)
                                     } else {
                                         Toast.makeText(activity, "Failed to add!", Toast.LENGTH_SHORT).show()
                                     }
-                                    progressBarRepository.release()
+                                    pbRepo.release()
                                 }
                             }.show()
                         }
@@ -138,8 +140,8 @@ private fun voteInfoBox(
     label: String,
     allowRemoving: Boolean = true,
     removableList: List<Int> = ArrayList(),
-    progressBarRepo: ProgressBarRepository = get(),
-    changeInfoRepo: ChangeInfoRepository = get()
+    pbRepo: ProgressBarRepository = get(),
+    ciRepo: ChangeInfoRepository = get()
 ) {
     val activity = LocalContext.current as MasterActivity
     val scope = rememberCoroutineScope()
@@ -186,7 +188,7 @@ private fun voteInfoBox(
                         ) {
                             AsyncImage(
                                 model = if (item.avatars.size > 0) item.avatars[item.avatars.size - 1].url else "",
-                                error = painterResource(id = getAvatarById(item._account_id)),
+                                error = painterResource(id = AccountUtils.getAvatarById(item._account_id)),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
@@ -225,22 +227,16 @@ private fun voteInfoBox(
                     if (removable) {
                         IconButton(
                             onClick = {
-                                buildRemoveVoteDialog(activity, label, item.value.let { if (it > 0) "+$it" else "$it" }, getShowedName(
-                                    AccountInfo(
-                                        name = item.name,
-                                        username = item.username,
-                                        email = item.email,
-                                        _account_id = item._account_id
-                                    )
-                                )
+                                buildRemoveVoteDialog(
+                                    activity, label, item.value.let { if (it > 0) "+$it" else "$it" }, item.display_name
                                 ) {
                                     scope.launch {
-                                        progressBarRepo.acquire()
-                                        val response = ChangesAPI.deleteVote(changeInfoRepo.changeInfo.value, item._account_id, label)
+                                        pbRepo.acquire()
+                                        val response = ChangesAPI.deleteVote(ciRepo.changeInfo.value, item._account_id, label)
                                         if (response.status.value in 200..299) {
-                                            changeInfoRepo.syncChangeWithRemote()
+                                            ciRepo.syncChangeWithRemote()
                                         }
-                                        progressBarRepo.release()
+                                        pbRepo.release()
                                     }
                                 }.show()
                             },

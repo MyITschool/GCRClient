@@ -1,8 +1,13 @@
-@file:OptIn(ExperimentalMaterialApi::class)
+@file:OptIn(
+    ExperimentalMaterialApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalAnimationApi::class
+)
 
 package com.elseboot3909.gcrclient.ui.change.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -22,11 +27,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.rememberBottomSheetScaffoldState
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -45,17 +49,21 @@ import com.elseboot3909.gcrclient.remote.api.ChangesAPI
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
 import com.elseboot3909.gcrclient.utils.AccountUtils
 import com.elseboot3909.gcrclient.utils.DateUtils
-import com.elseboot3909.gcrclient.viewmodel.change.ChangeInfoRepository
-import com.elseboot3909.gcrclient.repository.progress.ProgressBarRepository
+import com.elseboot3909.gcrclient.repository.ChangeInfoRepository
+import com.elseboot3909.gcrclient.repository.ProgressBarRepository
+import com.elseboot3909.gcrclient.ui.MasterActivity
+import com.elseboot3909.gcrclient.viewmodel.ChangeInfoViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 internal fun Info(
-    changeInfoRepo: ChangeInfoRepository = get(),
-    progressBarRepo: ProgressBarRepository = get()
+    pbRepo: ProgressBarRepository = get(),
+    ciRepo: ChangeInfoRepository = get(),
+    ciViewModel: ChangeInfoViewModel = getViewModel(owner = LocalContext.current as MasterActivity)
 ) {
-    val changeInfo: ChangeInfo by changeInfoRepo.changeInfo.collectAsState()
+    val changeInfo: ChangeInfo by ciViewModel.changeInfo.observeAsState(ChangeInfo())
     if (changeInfo.id.isEmpty()) return
     val scope = rememberCoroutineScope()
     val bottomSheet = rememberBottomSheetScaffoldState()
@@ -92,13 +100,13 @@ internal fun Info(
                     icon = { Icon(imageVector = Icons.Default.Save, contentDescription = null) },
                     onClick = {
                         scope.launch {
-                            progressBarRepo.acquire()
+                            pbRepo.acquire()
                             bottomSheet.bottomSheetState.collapse()
                             val response = ChangesAPI.setCommitMessage(changeInfo, CommitMessageInput(commitMsgEditable))
                             if (response.status.value in 200..299) {
-                                changeInfoRepo.syncChangeWithRemote()
+                                ciRepo.syncChangeWithRemote()
                             }
-                            progressBarRepo.release()
+                            pbRepo.release()
                         }
                     },
                     modifier = Modifier

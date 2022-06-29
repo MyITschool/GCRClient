@@ -25,13 +25,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.elseboot3909.gcrclient.entity.internal.ChangeInfoPreview
 import com.elseboot3909.gcrclient.entity.internal.convertInPreview
+import com.elseboot3909.gcrclient.repository.SearchParamsRepository
 import com.elseboot3909.gcrclient.ui.MasterScreens
-import com.elseboot3909.gcrclient.ui.common.ChangesList
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
 import com.elseboot3909.gcrclient.ui.common.progress.ProgressBar
+import com.elseboot3909.gcrclient.ui.home.screens.common.ChangesList
 import com.elseboot3909.gcrclient.utils.Constants
 import com.elseboot3909.gcrclient.viewmodel.home.ChangesViewModel
-import com.elseboot3909.gcrclient.repository.search.SearchParamsRepository
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import kotlinx.coroutines.launch
@@ -44,6 +44,7 @@ internal fun Changes(
     masterNavCtl: NavHostController,
 ) {
     ChangesTopAppBar(drawerState, masterNavCtl)
+    ProgressBar()
 }
 
 @Composable
@@ -58,7 +59,6 @@ private fun ChangesTopAppBar(
     val changesList = changesModel.changesList.observeAsState(ArrayList())
     Scaffold(
         topBar = {
-            ProgressBar()
             Row(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)

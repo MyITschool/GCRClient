@@ -1,4 +1,4 @@
-package com.elseboot3909.gcrclient.repository.progress
+package com.elseboot3909.gcrclient.repository
 
 import kotlinx.coroutines.flow.MutableStateFlow
 

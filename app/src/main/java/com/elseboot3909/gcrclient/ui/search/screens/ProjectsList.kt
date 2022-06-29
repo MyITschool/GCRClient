@@ -32,7 +32,7 @@ import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.entity.external.ProjectInfo
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
 import com.elseboot3909.gcrclient.viewmodel.search.ProjectsListViewModel
-import com.elseboot3909.gcrclient.repository.search.SearchParamsRepository
+import com.elseboot3909.gcrclient.repository.SearchParamsRepository
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.koin.androidx.compose.get

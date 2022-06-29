@@ -1,7 +1,8 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 
 package com.elseboot3909.gcrclient.ui.comment
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,12 +16,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -28,13 +30,13 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.elseboot3909.gcrclient.entity.external.CommentInfo
 import com.elseboot3909.gcrclient.entity.internal.getAvatar
+import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
 import com.elseboot3909.gcrclient.ui.diff.screens.LineCounter
-import com.elseboot3909.gcrclient.utils.AccountUtils.Companion.getAvatarById
-import com.elseboot3909.gcrclient.utils.AccountUtils.Companion.getShowedName
+import com.elseboot3909.gcrclient.utils.AccountUtils
 import com.elseboot3909.gcrclient.utils.DateUtils
-import com.elseboot3909.gcrclient.viewmodel.comments.CommentsViewModel
-import org.koin.androidx.compose.get
+import com.elseboot3909.gcrclient.viewmodel.CommentsViewModel
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 internal fun CommentScreenContent(masterNavCtl: NavController) {
@@ -44,9 +46,9 @@ internal fun CommentScreenContent(masterNavCtl: NavController) {
 @Composable
 private fun CommentScreenTopBar(
     masterNavCtl: NavController,
-    commentsViewModel: CommentsViewModel = get()
+    cViewModel: CommentsViewModel = getViewModel(owner = LocalContext.current as MasterActivity)
 ) {
-    val label by commentsViewModel.currentFile.collectAsState()
+    val fileName by cViewModel.currentFile.observeAsState("")
     Scaffold(
         topBar = {
             Column(modifier = Modifier.wrapContentHeight()) {
@@ -65,7 +67,7 @@ private fun CommentScreenTopBar(
                     backgroundColor = getBackgroundColor()
                 )
                 Text(
-                    text = realFileName(label),
+                    text = realFileName(fileName),
                     style = MaterialTheme.typography.titleLarge,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
@@ -83,8 +85,8 @@ private fun CommentScreenTopBar(
                     .padding(start = 8.dp, end = 8.dp, top = 6.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                val list = commentsViewModel.comments.value?.get(label) ?: ArrayList()
-                for (comment in list) {
+                val fileComments = cViewModel.comments.value?.get(fileName) ?: ArrayList()
+                for (comment in fileComments) {
                     if (comment.in_reply_to.isEmpty()) {
                         Card(
                             shape = RoundedCornerShape(6.dp),
@@ -93,7 +95,7 @@ private fun CommentScreenTopBar(
                                 .fillMaxWidth()
                                 .padding(top = 5.dp, bottom = 5.dp)
                         ) {
-                            CommentsList(comment, list)
+                            CommentsList(comment, fileComments)
                         }
                     }
                 }
@@ -117,7 +119,7 @@ private fun CommentsList(
                 AsyncImage(
                     model = getAvatar(current.author.avatars),
                     contentDescription = null,
-                    error = painterResource(id = getAvatarById(current.author._account_id)),
+                    error = painterResource(id = AccountUtils.getAvatarById(current.author._account_id)),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(40.dp)
@@ -129,7 +131,7 @@ private fun CommentsList(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = getShowedName(current.author),
+                            text = AccountUtils.getShowedName(current.author),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         val date = DateUtils.dateInputFormat.parse(current.updated.replace(".000000000", ""))
@@ -169,7 +171,9 @@ private fun CommentsList(
                             Modifier
                                 .height(IntrinsicSize.Min)
                                 .background(
-                                    color = if (!markedLines.contains(item.line_number)) backgroundColor else Color(0xFFA8C023)
+                                    color = if (!markedLines.contains(item.line_number)) backgroundColor else Color(
+                                        0xFFA8C023
+                                    )
                                 )
                         ) {
                             Row(modifier = Modifier.background(color = Color(0xFF313335))) {

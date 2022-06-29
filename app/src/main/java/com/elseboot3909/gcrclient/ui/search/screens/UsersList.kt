@@ -34,8 +34,7 @@ import com.elseboot3909.gcrclient.entity.external.AccountInfo
 import com.elseboot3909.gcrclient.entity.internal.getAvatar
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
 import com.elseboot3909.gcrclient.utils.AccountUtils
-import com.elseboot3909.gcrclient.utils.AccountUtils.Companion.getShowedName
-import com.elseboot3909.gcrclient.repository.search.SearchParamsRepository
+import com.elseboot3909.gcrclient.repository.SearchParamsRepository
 import com.elseboot3909.gcrclient.viewmodel.search.UsersListViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -168,7 +167,7 @@ private fun UserListItem(
             )
             Column(modifier = Modifier.padding(start = 6.dp)) {
                 Text(
-                    text = getShowedName(accountInfo),
+                    text = accountInfo.display_name,
                     style = MaterialTheme.typography.titleSmall,
                     color = Color.Black,
                 )

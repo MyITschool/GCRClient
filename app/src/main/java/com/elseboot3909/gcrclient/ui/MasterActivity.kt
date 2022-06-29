@@ -16,8 +16,10 @@ import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.elseboot3909.gcrclient.ServerData
 import com.elseboot3909.gcrclient.credentials.dataStores
 import com.elseboot3909.gcrclient.remote.client
+import com.elseboot3909.gcrclient.repository.CredentialsRepository
 import com.elseboot3909.gcrclient.repository.repos
 import com.elseboot3909.gcrclient.ui.change.ChangeScreenContent
 import com.elseboot3909.gcrclient.ui.comment.CommentScreenContent
@@ -29,12 +31,15 @@ import com.elseboot3909.gcrclient.ui.search.SearchScreenContent
 import com.elseboot3909.gcrclient.ui.switcher.SwitcherScreenContent
 import com.elseboot3909.gcrclient.ui.theme.MainTheme
 import com.elseboot3909.gcrclient.ui.vote.VoteScreenContent
-import com.elseboot3909.gcrclient.viewmodel.credentials.CredentialsViewModel
+import com.elseboot3909.gcrclient.utils.Animations.SCREENS_ANIM_TIME
+import com.elseboot3909.gcrclient.utils.Animations.SPLASH_ANIM_TIME
+import com.elseboot3909.gcrclient.viewmodel.CredentialsViewModel
 import com.elseboot3909.gcrclient.viewmodel.viewModels
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.core.context.startKoin
@@ -46,6 +51,10 @@ class MasterActivity : AppCompatActivity() {
 
     private val credentialsViewModel by lazy {
         getViewModel<CredentialsViewModel>()
+    }
+
+    private val credentialsRepository by lazy {
+        get<CredentialsRepository>()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,8 +70,9 @@ class MasterActivity : AppCompatActivity() {
             })
         }
 
-        credentialsViewModel.selected.observe(this) {
-            credentialsViewModel.serversList.observe(this) {
+        credentialsViewModel.selected.observe(this) { i ->
+            credentialsViewModel.serversList.observe(this) { lst ->
+                credentialsRepository.currentServerData = lst?.serverDataList?.get(i) ?: ServerData.getDefaultInstance()
                 if (credentialsViewModel.isInitialized.value == false) {
                     credentialsViewModel.isInitialized.postValue(true)
                 }
@@ -80,7 +90,7 @@ class MasterActivity : AppCompatActivity() {
                     1f,
                     0f
                 )
-                alpha.duration = 750L
+                alpha.duration = SPLASH_ANIM_TIME
                 alpha.doOnEnd { view.remove() }
                 alpha.start()
             }
@@ -115,7 +125,7 @@ class MasterActivity : AppCompatActivity() {
                 enterTransition = {
                     when (initialState.destination.route) {
                         MasterScreens.HomeScreen.route -> {
-                            slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                            slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -123,7 +133,7 @@ class MasterActivity : AppCompatActivity() {
                 popExitTransition = {
                     when (targetState.destination.route) {
                         MasterScreens.HomeScreen.route -> {
-                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -131,7 +141,7 @@ class MasterActivity : AppCompatActivity() {
                 exitTransition = {
                     when (initialState.destination.route) {
                         MasterScreens.HomeScreen.route -> {
-                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -146,7 +156,7 @@ class MasterActivity : AppCompatActivity() {
                     when (initialState.destination.route) {
                         "${MasterScreens.LoginScreen.route}/{isInit}",
                         MasterScreens.SwitcherScreen.route -> {
-                            slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                            slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -156,7 +166,7 @@ class MasterActivity : AppCompatActivity() {
                         "${MasterScreens.LoginScreen.route}/{isInit}",
                         MasterScreens.SwitcherScreen.route,
                         MasterScreens.ChangeScreen.route -> {
-                            slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                            slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -166,7 +176,7 @@ class MasterActivity : AppCompatActivity() {
                         "${MasterScreens.LoginScreen.route}/{isInit}",
                         MasterScreens.SwitcherScreen.route,
                         MasterScreens.ChangeScreen.route -> {
-                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -187,7 +197,7 @@ class MasterActivity : AppCompatActivity() {
                 enterTransition = {
                     when (initialState.destination.route) {
                         MasterScreens.HomeScreen.route -> {
-                            slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                            slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -195,7 +205,7 @@ class MasterActivity : AppCompatActivity() {
                 popExitTransition = {
                     when (targetState.destination.route) {
                         MasterScreens.HomeScreen.route -> {
-                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -203,7 +213,7 @@ class MasterActivity : AppCompatActivity() {
                 exitTransition = {
                     when (targetState.destination.route) {
                         MasterScreens.HomeScreen.route -> {
-                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -217,7 +227,10 @@ class MasterActivity : AppCompatActivity() {
                 enterTransition = {
                     when (initialState.destination.route) {
                         MasterScreens.HomeScreen.route -> {
-                            slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                            slideIntoContainer(
+                                AnimatedContentScope.SlideDirection.Left,
+                                animationSpec = tween(SCREENS_ANIM_TIME)
+                            )
                         }
                         else -> null
                     }
@@ -225,7 +238,7 @@ class MasterActivity : AppCompatActivity() {
                 popEnterTransition = {
                     when (initialState.destination.route) {
                         "${MasterScreens.VoteScreen.route}/{label}" -> {
-                            slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                            slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -233,10 +246,10 @@ class MasterActivity : AppCompatActivity() {
                 exitTransition = {
                     when (targetState.destination.route) {
                         MasterScreens.HomeScreen.route -> {
-                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         "${MasterScreens.VoteScreen.route}/{label}" -> {
-                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -256,7 +269,7 @@ class MasterActivity : AppCompatActivity() {
                 enterTransition = {
                     when (initialState.destination.route) {
                         MasterScreens.ChangeScreen.route -> {
-                            slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                            slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }
@@ -264,7 +277,7 @@ class MasterActivity : AppCompatActivity() {
                 exitTransition = {
                     when (targetState.destination.route) {
                         MasterScreens.ChangeScreen.route -> {
-                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                            slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(SCREENS_ANIM_TIME))
                         }
                         else -> null
                     }

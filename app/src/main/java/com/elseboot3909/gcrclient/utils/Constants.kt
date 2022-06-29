@@ -1,24 +1,29 @@
+@file:OptIn(ExperimentalAnimationApi::class)
+
 package com.elseboot3909.gcrclient.utils
 
-class Constants {
-    companion object {
-        const val LOG_TAG = "GCRClient"
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.IntSize
 
-        const val SECURITY_KEY = "gcrclient"
+object Constants {
+    const val LOG_TAG = "GCRClient"
 
-        const val NAV_DRAWER_TIMEOUT: Long = 250
+    const val SECURITY_KEY = "gcrclient"
 
-        const val DEFAULT_ANIMATION_TIME = 250
+    const val NAV_DRAWER_TIMEOUT = 250L
 
-        const val SEARCH_ACQUIRED = 1
-        const val CHANGE_STATE_CHANGED = 2
-        const val ACCOUNT_SWITCHED = 3
 
-        const val MAX_FETCHED_CHANGES = 25
 
-        const val FILE_CHANGE_ID_KEY = "fileChangeID"
-        const val FILE_PATCHSET_A_KEY = "filePatchSetA"
-        const val FILE_PATCHSET_B_KEY = "filePatchSetB"
-        const val FILE_NAME_KEY = "fileName"
-    }
+    const val MAX_FETCHED_CHANGES = 25
 }
+
+object Animations {
+    const val SCREENS_ANIM_TIME = 250
+    const val SPLASH_ANIM_TIME = 750L
+}
+

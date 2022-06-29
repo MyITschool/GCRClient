@@ -1,4 +1,4 @@
-package com.elseboot3909.gcrclient.ui.common
+package com.elseboot3909.gcrclient.ui.home.screens.common
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
@@ -19,17 +19,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.elseboot3909.gcrclient.entity.internal.ChangeInfoPreview
+import com.elseboot3909.gcrclient.repository.SearchParamsRepository
 import com.elseboot3909.gcrclient.ui.MasterScreens
+import com.elseboot3909.gcrclient.ui.common.LinesChangedCount
 import com.elseboot3909.gcrclient.utils.Constants
-import com.elseboot3909.gcrclient.viewmodel.change.ChangeInfoRepository
-import com.elseboot3909.gcrclient.repository.search.SearchParamsRepository
+import com.elseboot3909.gcrclient.repository.ChangeInfoRepository
+import com.elseboot3909.gcrclient.ui.MasterActivity
+import com.elseboot3909.gcrclient.viewmodel.ChangeInfoViewModel
 import org.koin.androidx.compose.get
+import org.koin.androidx.compose.getViewModel
 
 @ExperimentalMaterial3Api
 @ExperimentalAnimationApi
@@ -39,7 +44,8 @@ fun ChangesList(
     listState: LazyListState,
     masterNavCtl: NavHostController,
     requiresPadding: Boolean = false,
-    changeInfoRepo: ChangeInfoRepository = get(),
+    ciViewModel: ChangeInfoViewModel = getViewModel(owner = LocalContext.current as MasterActivity),
+    ciRepo: ChangeInfoRepository = get(),
     searchRepo: SearchParamsRepository = get()
 ) {
     val descriptionSize = (LocalConfiguration.current.screenWidthDp - 114).dp
@@ -54,8 +60,8 @@ fun ChangesList(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clickable {
-                            changeInfoRepo.changeInfo.value = changesList[it].changeInfo
-                            changeInfoRepo.syncChangeWithRemote()
+                            ciViewModel.changeInfo.value = changesList[it].changeInfo
+                            ciRepo.syncChangeWithRemote()
                             masterNavCtl.navigate(MasterScreens.ChangeScreen.route)
                         }
                         .padding(bottom = 6.dp, top = 6.dp)

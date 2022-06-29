@@ -19,6 +19,7 @@ import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,6 +30,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.entity.external.ChangeInfo
 import com.elseboot3909.gcrclient.remote.api.AccountAPI
+import com.elseboot3909.gcrclient.repository.StarredRepository
 import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.ui.change.screens.Code
 import com.elseboot3909.gcrclient.ui.change.screens.Comment
@@ -37,14 +39,16 @@ import com.elseboot3909.gcrclient.ui.change.screens.Vote
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
 import com.elseboot3909.gcrclient.ui.common.progress.ProgressBar
 import com.elseboot3909.gcrclient.ui.theme.NoRippleTheme
-import com.elseboot3909.gcrclient.viewmodel.change.ChangeInfoRepository
-import com.elseboot3909.gcrclient.repository.progress.ProgressBarRepository
+import com.elseboot3909.gcrclient.repository.ChangeInfoRepository
+import com.elseboot3909.gcrclient.repository.ProgressBarRepository
+import com.elseboot3909.gcrclient.viewmodel.ChangeInfoViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import io.ktor.client.statement.*
+import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 internal fun ChangeScreenContent(masterNavCtl: NavController) {
@@ -54,8 +58,10 @@ internal fun ChangeScreenContent(masterNavCtl: NavController) {
 @Composable
 private fun ChangeScreenScaffold(
     masterNavCtl: NavController,
-    changeInfoRepo: ChangeInfoRepository = get(),
-    progressBarRepository: ProgressBarRepository = get()
+    ciRepo: ChangeInfoRepository = get(),
+    pbRepo: ProgressBarRepository = get(),
+    sRepo: StarredRepository = get(),
+    ciViewModel: ChangeInfoViewModel = getViewModel(owner = LocalContext.current as MasterActivity)
 ) {
     val navController = rememberAnimatedNavController()
     val scope = rememberCoroutineScope()
@@ -65,7 +71,7 @@ private fun ChangeScreenScaffold(
             Column(
                 modifier = Modifier.wrapContentHeight()
             ) {
-                val changeInfo: ChangeInfo by changeInfoRepo.changeInfo.collectAsState()
+                val changeInfo: ChangeInfo by ciViewModel.changeInfo.observeAsState(ChangeInfo())
                 TopAppBar(
                     title = {},
                     navigationIcon = {
@@ -104,12 +110,13 @@ private fun ChangeScreenScaffold(
                         }
                         IconButton(onClick = {
                             scope.launch {
-                                progressBarRepository.acquire()
+                                pbRepo.acquire()
                                 val response: HttpResponse = if (changeInfo.starred) AccountAPI.removeDefaultStarFromChange(changeInfo) else AccountAPI.putDefaultStarOnChange(changeInfo)
                                 if (response.status.value in 200..299) {
-                                    changeInfoRepo.syncChangeWithRemote()
+                                    if (changeInfo.starred) sRepo.removeStarredChange(changeInfo) else sRepo.addStarredChange(changeInfo)
+                                    ciRepo.syncChangeWithRemote()
                                 }
-                                progressBarRepository.release()
+                                pbRepo.release()
                             }
                         }) {
                             Icon(

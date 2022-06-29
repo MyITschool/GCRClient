@@ -23,7 +23,7 @@ import com.elseboot3909.gcrclient.ServerData
 import com.elseboot3909.gcrclient.credentials.dataStore.SelectedDataStore
 import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.ui.common.SetBackground
-import com.elseboot3909.gcrclient.viewmodel.credentials.CredentialsViewModel
+import com.elseboot3909.gcrclient.viewmodel.CredentialsViewModel
 import com.elseboot3909.gcrclient.viewmodel.home.ChangesViewModel
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel

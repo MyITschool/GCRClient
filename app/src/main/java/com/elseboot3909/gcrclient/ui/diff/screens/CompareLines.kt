@@ -1,29 +1,35 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 
 package com.elseboot3909.gcrclient.ui.diff.screens
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.elseboot3909.gcrclient.repository.diff.DiffRepository
-import com.elseboot3909.gcrclient.repository.diff.FileDiffRepository
-import org.koin.androidx.compose.get
+import com.elseboot3909.gcrclient.entity.external.DiffInfo
+import com.elseboot3909.gcrclient.ui.MasterActivity
+import com.elseboot3909.gcrclient.viewmodel.FileDiffViewModel
+import org.koin.androidx.compose.getViewModel
 import kotlin.math.max
 
 @Composable
 internal fun CompareLines(
-    fileDiffViewModel: FileDiffRepository = get(),
-    diffRepo: DiffRepository = get()
+    fdViewModel: FileDiffViewModel = getViewModel(owner = LocalContext.current as MasterActivity)
 ) {
-    val diffInfo = fileDiffViewModel.diffInfo.collectAsState()
+    val diffInfo = fdViewModel.diffInfo.observeAsState(DiffInfo())
     val maxSize = max(diffInfo.value.meta_a.lines, diffInfo.value.meta_b.lines).toString().length
     val parsedContent = ArrayList<ParsedPart>()
     var offsetA = 0
@@ -120,7 +126,7 @@ internal fun CompareLines(
             )
         }
     }
-    val fileName = diffRepo.file.collectAsState()
+    val fileName = fdViewModel.fileName.observeAsState("")
     Scaffold(
         topBar = {
             LineText(
@@ -194,14 +200,12 @@ fun LineCounter(count: String, offset: String) {
     Text(
         buildAnnotatedString {
             withStyle(
-                style = MaterialTheme.typography.bodyMedium.toSpanStyle()
-                    .copy(color = Color(0xFFA4A3A3))
+                style = MaterialTheme.typography.bodyMedium.toSpanStyle().copy(color = Color(0xFFA4A3A3))
             ) {
                 append(count)
             }
             withStyle(
-                style = MaterialTheme.typography.bodyMedium.toSpanStyle()
-                    .copy(color = Color.Transparent)
+                style = MaterialTheme.typography.bodyMedium.toSpanStyle().copy(color = Color.Transparent)
             ) {
                 append(offset)
             }

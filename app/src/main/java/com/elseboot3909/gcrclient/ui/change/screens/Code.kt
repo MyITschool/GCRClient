@@ -1,7 +1,8 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 
 package com.elseboot3909.gcrclient.ui.change.screens
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,44 +17,49 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.elseboot3909.gcrclient.entity.external.ChangeInfo
+import com.elseboot3909.gcrclient.repository.ChangedFilesRepository
+import com.elseboot3909.gcrclient.repository.FileDiffRepository
+import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.ui.MasterScreens
 import com.elseboot3909.gcrclient.ui.common.LinesChangedCount
 import com.elseboot3909.gcrclient.ui.common.changedCountString
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
-import com.elseboot3909.gcrclient.viewmodel.change.ChangeInfoRepository
-import com.elseboot3909.gcrclient.repository.diff.DiffRepository
-import com.elseboot3909.gcrclient.repository.diff.FilesRepository
+import com.elseboot3909.gcrclient.viewmodel.ChangedFilesViewModel
+import com.elseboot3909.gcrclient.viewmodel.ChangeInfoViewModel
 import org.koin.androidx.compose.get
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 internal fun Code(
     masterNavCtl: NavController,
-    changeInfoRepo: ChangeInfoRepository = get(),
-    diffRepo: DiffRepository = get(),
-    filesModelRepo: FilesRepository = get()
+    cfRepo: ChangedFilesRepository = get(),
+    cfViewModel: ChangedFilesViewModel = getViewModel(owner = LocalContext.current as MasterActivity),
+    ciViewModel: ChangeInfoViewModel = getViewModel(owner = LocalContext.current as MasterActivity)
 ) {
-    val changeInfo: ChangeInfo by changeInfoRepo.changeInfo.collectAsState()
+    val changeInfo: ChangeInfo by ciViewModel.changeInfo.observeAsState(ChangeInfo())
     if (changeInfo.id.isEmpty()) return
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val revisions =
         changeInfo.revisions.keys.sortedWith(compareBy { changeInfo.revisions[it]?._number })
     Column(modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 8.dp)) {
-        val base by diffRepo.base.collectAsState()
-        val revision by diffRepo.revision.collectAsState()
+        val base by cfViewModel.base.observeAsState(0)
+        val revision by cfViewModel.revision.observeAsState("")
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             patchsetSelection(
-                onSelect = { i -> diffRepo.base.value = i },
+                onSelect = { i -> cfRepo.base.value = i },
                 selected = base,
                 from = 0,
                 to = revisions.indexOf(revision) + 1
@@ -64,13 +70,13 @@ internal fun Code(
                 modifier = Modifier.size((screenWidth * 0.075).dp)
             )
             patchsetSelection(
-                onSelect = { i -> diffRepo.revision.value = revisions[i - 1] },
+                onSelect = { i -> cfRepo.revision.value = revisions[i - 1] },
                 selected = revisions.indexOf(revision) + 1,
                 from = base + 1,
                 to = revisions.size + 1
             )
         }
-        CodeFilesList(filesModelRepo, masterNavCtl)
+        CodeFilesList(masterNavCtl)
     }
 }
 
@@ -133,12 +139,12 @@ private fun patchsetSelection(
 
 @Composable
 private fun CodeFilesList(
-    filesModel: FilesRepository,
     masterNavCtl: NavController,
-    diffRepo: DiffRepository = get()
+    fdRepo: FileDiffRepository = get(),
+    cfViewModel: ChangedFilesViewModel = getViewModel(owner = LocalContext.current as MasterActivity)
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    val filesList by filesModel.filesList.collectAsState()
+    val filesList by cfViewModel.changedFiles.observeAsState(HashMap())
     filesList.remove("/COMMIT_MSG")
     LazyColumn(modifier = Modifier.padding(top = 4.dp)) {
         filesList.keys.forEach { file ->
@@ -151,7 +157,7 @@ private fun CodeFilesList(
                         .padding(top = 4.dp, bottom = 2.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
-                            diffRepo.file.value = file
+                            fdRepo.fileName.value = file
                             masterNavCtl.navigate(route = MasterScreens.DiffScreen.route)
                         },
                     shape = RoundedCornerShape(8.dp)

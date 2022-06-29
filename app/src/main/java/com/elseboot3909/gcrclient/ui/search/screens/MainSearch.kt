@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.elseboot3909.gcrclient.ui.search.screens
 
@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
 import com.elseboot3909.gcrclient.ui.search.Screens
-import com.elseboot3909.gcrclient.repository.search.SearchParamsRepository
+import com.elseboot3909.gcrclient.repository.SearchParamsRepository
 import org.koin.androidx.compose.get
 
 @Composable

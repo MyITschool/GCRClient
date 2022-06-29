@@ -1,4 +1,4 @@
-package com.elseboot3909.gcrclient.repository.search
+package com.elseboot3909.gcrclient.repository
 
 import android.text.TextUtils
 import android.util.Log
