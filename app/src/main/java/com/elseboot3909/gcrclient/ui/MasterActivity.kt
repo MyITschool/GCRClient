@@ -17,10 +17,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.elseboot3909.gcrclient.ServerData
-import com.elseboot3909.gcrclient.credentials.dataStores
-import com.elseboot3909.gcrclient.remote.client
 import com.elseboot3909.gcrclient.repository.CredentialsRepository
-import com.elseboot3909.gcrclient.repository.repos
 import com.elseboot3909.gcrclient.ui.change.ChangeScreenContent
 import com.elseboot3909.gcrclient.ui.comment.CommentScreenContent
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
@@ -34,16 +31,12 @@ import com.elseboot3909.gcrclient.ui.vote.VoteScreenContent
 import com.elseboot3909.gcrclient.utils.Animations.SCREENS_ANIM_TIME
 import com.elseboot3909.gcrclient.utils.Animations.SPLASH_ANIM_TIME
 import com.elseboot3909.gcrclient.viewmodel.CredentialsViewModel
-import com.elseboot3909.gcrclient.viewmodel.viewModels
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.koin.android.ext.android.get
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.ext.android.getViewModel
-import org.koin.core.context.startKoin
-import org.koin.core.module.Module
 
 @ExperimentalMaterial3Api
 @ExperimentalAnimationApi
@@ -59,16 +52,6 @@ class MasterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        startKoin {
-            androidContext(applicationContext)
-            modules(ArrayList<Module>().also {
-                it.add(dataStores)
-                it.add(viewModels)
-                it.add(repos)
-                it.add(client)
-            })
-        }
 
         credentialsViewModel.selected.observe(this) { i ->
             credentialsViewModel.serversList.observe(this) { lst ->
