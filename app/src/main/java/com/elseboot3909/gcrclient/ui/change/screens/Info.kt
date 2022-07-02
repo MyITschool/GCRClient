@@ -39,9 +39,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.ServerData
 import com.elseboot3909.gcrclient.entity.external.ChangeInfo
 import com.elseboot3909.gcrclient.entity.external.CommitMessageInput
@@ -96,7 +98,7 @@ internal fun Info(
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground)
                 )
                 ExtendedFloatingActionButton(
-                    text = { Text(text = "Save") },
+                    text = { Text(text = stringResource(R.string.save)) },
                     icon = { Icon(imageVector = Icons.Default.Save, contentDescription = null) },
                     onClick = {
                         scope.launch {
@@ -147,7 +149,7 @@ internal fun Info(
             val infoList = ArrayList<InfoData>()
             if (changeInfo.owner.name.isNotEmpty()) infoList.add(
                 InfoData(
-                    label = "Owner",
+                    label = R.string.owner,
                     str = changeInfo.owner.name,
                     requiresAvatar = true,
                     url = if (changeInfo.owner.avatars.size != 0) changeInfo.owner.avatars[changeInfo.owner.avatars.size - 1].url else ""
@@ -159,7 +161,7 @@ internal fun Info(
                 if (subArray != null && subArray.size > 0) {
                     infoList.add(
                         InfoData(
-                            label = "Reviewer",
+                            label = R.string.reviewer,
                             str = subArray[0].name,
                             requiresAvatar = true,
                             url = if (subArray[0].avatars.size != 0) subArray[0].avatars[subArray[0].avatars.size - 1].url else ""
@@ -172,7 +174,7 @@ internal fun Info(
                 if (subArray != null && subArray.size > 0) {
                     infoList.add(
                         InfoData(
-                            label = "CC",
+                            label = R.string.cc,
                             str = subArray[0].name,
                             requiresAvatar = true,
                             url = if (subArray[0].avatars.size != 0) subArray[0].avatars[subArray[0].avatars.size - 1].url else ""
@@ -182,18 +184,18 @@ internal fun Info(
             }
             if (changeInfo.project.isNotEmpty()) infoList.add(
                 InfoData(
-                    label = "Project",
+                    label = R.string.project,
                     str = changeInfo.project
                 )
             )
-            if (changeInfo.branch.isNotEmpty()) infoList.add(InfoData("Branch", changeInfo.branch))
-            if (changeInfo.topic.isNotEmpty()) infoList.add(InfoData("Topic", changeInfo.topic))
+            if (changeInfo.branch.isNotEmpty()) infoList.add(InfoData(R.string.branch, changeInfo.branch))
+            if (changeInfo.topic.isNotEmpty()) infoList.add(InfoData(R.string.topic, changeInfo.topic))
             for (info in infoList) {
                 Row(
                     modifier = Modifier.defaultMinSize(minHeight = 42.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = info.label, style = MaterialTheme.typography.titleMedium)
+                    Text(text = stringResource(info.label), style = MaterialTheme.typography.titleMedium)
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.End
@@ -256,7 +258,7 @@ internal fun Info(
                 )
                 if (get<ServerData>().username == changeInfo.owner.username) {
                     ExtendedFloatingActionButton(
-                        text = { Text(text = "Edit") },
+                        text = { Text(text = stringResource(R.string.edit)) },
                         icon = { Icon(imageVector = Icons.Default.Edit, contentDescription = null) },
                         onClick = { scope.launch {
                             bottomSheet.bottomSheetState.expand()
@@ -271,7 +273,7 @@ internal fun Info(
 }
 
 data class InfoData(
-    val label: String = "",
+    val label: Int = 0,
     val str: String = "",
     val requiresAvatar: Boolean = false,
     val url: String = ""

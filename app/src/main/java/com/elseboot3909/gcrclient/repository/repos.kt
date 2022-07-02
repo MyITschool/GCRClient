@@ -8,8 +8,9 @@ val repos = module {
     single { ChangedFilesRepository(get(), get()) }
     single { FileDiffRepository(get(), get()) }
     single { CommentsRepository(get(), get()) }
+    single { ProjectsListRepository(get()) }
     single { CredentialsRepository() }
-
+    single { ChangesListRepository(get(), get()) }
     single { ChangeInfoRepository(get()) }
     single { SearchParamsRepository() }
 }

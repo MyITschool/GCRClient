@@ -19,14 +19,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.elseboot3909.gcrclient.ServerData
 import com.elseboot3909.gcrclient.credentials.dataStore.SelectedDataStore
+import com.elseboot3909.gcrclient.repository.repos
 import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.ui.common.SetBackground
 import com.elseboot3909.gcrclient.viewmodel.CredentialsViewModel
-import com.elseboot3909.gcrclient.viewmodel.home.ChangesViewModel
+import com.elseboot3909.gcrclient.viewmodel.viewModels
+import org.koin.android.ext.android.getKoin
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
+import org.koin.core.module.Module
 
 @Composable
 internal fun SwitcherScreenContent(navController: NavHostController) {
@@ -38,13 +40,11 @@ internal fun SwitcherScreenContent(navController: NavHostController) {
 private fun ServerList(
     navController: NavHostController,
     credentialsViewModel: CredentialsViewModel = getViewModel(),
-    changesViewModel: ChangesViewModel = getViewModel(),
     selectedDataStore: SelectedDataStore = get()
 ) {
+    val activity = LocalContext.current as MasterActivity
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val serversList = credentialsViewModel.serversList.observeAsState()
-    val activity = LocalContext.current as MasterActivity
-    val finalServersList: List<ServerData> = serversList.value?.serverDataList?.mapNotNull { it } ?: ArrayList()
     Column(
         Modifier
             .fillMaxHeight()
@@ -60,13 +60,14 @@ private fun ServerList(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(start = 28.dp, end = 28.dp, bottom = 48.dp, top = 72.dp)
         ) {
-            itemsIndexed(items = finalServersList, itemContent = { index, item ->
+            itemsIndexed(items = serversList.value ?: ArrayList(), itemContent = { index, item ->
                 Row {
                     Card(
                         shape = MaterialTheme.shapes.medium,
                         onClick = {
                             selectedDataStore.updateSelected(index)
-                            activity.restartRequest()
+                            activity.resetData()
+                            navController.popBackStack()
                         },
                         modifier = Modifier.defaultMinSize(minHeight = 42.dp)
                     ) {

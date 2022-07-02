@@ -5,7 +5,6 @@ package com.elseboot3909.gcrclient.ui.change
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -41,6 +41,7 @@ import com.elseboot3909.gcrclient.ui.common.progress.ProgressBar
 import com.elseboot3909.gcrclient.ui.theme.NoRippleTheme
 import com.elseboot3909.gcrclient.repository.ChangeInfoRepository
 import com.elseboot3909.gcrclient.repository.ProgressBarRepository
+import com.elseboot3909.gcrclient.utils.Animations.SCREEN_ANIMATION
 import com.elseboot3909.gcrclient.viewmodel.ChangeInfoViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -65,7 +66,6 @@ private fun ChangeScreenScaffold(
 ) {
     val navController = rememberAnimatedNavController()
     val scope = rememberCoroutineScope()
-    val activity = LocalContext.current as MasterActivity
     Scaffold(
         topBar = {
             Column(
@@ -83,16 +83,16 @@ private fun ChangeScreenScaffold(
                         }
                     },
                     actions = {
-                        val statusList = ArrayList<String>()
-                        if (changeInfo.work_in_progress) statusList.add(activity.getString(R.string.wip))
+                        val statusList = ArrayList<Int>()
+                        if (changeInfo.work_in_progress) statusList.add(R.string.wip)
                         when (changeInfo.status) {
-                            "NEW" -> statusList.add(activity.getString(R.string.active))
-                            "MERGED" -> statusList.add(activity.getString(R.string.active))
-                            "ABANDONED" -> statusList.add(activity.getString(R.string.abandoned))
+                            "NEW" -> statusList.add(R.string.active)
+                            "MERGED" -> statusList.add(R.string.active)
+                            "ABANDONED" -> statusList.add(R.string.abandoned)
                         }
                         for (status in statusList) {
                             Text(
-                                text = status,
+                                text = stringResource(status),
                                 modifier = Modifier
                                     .padding(start = 2.dp, end = 2.dp)
                                     .border(
@@ -188,7 +188,7 @@ private fun ChangeScreenNavCtl(navController: NavHostController, masterNavCtl: N
                     Screens.Code.route,
                     Screens.Vote.route,
                     Screens.Comment.route -> {
-                        slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                        slideIntoContainer(AnimatedContentScope.SlideDirection.Right, SCREEN_ANIMATION)
                     }
                     else -> null
                 }
@@ -198,7 +198,7 @@ private fun ChangeScreenNavCtl(navController: NavHostController, masterNavCtl: N
                     Screens.Code.route,
                     Screens.Vote.route,
                     Screens.Comment.route -> {
-                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, SCREEN_ANIMATION)
                     }
                     else -> null
                 }
@@ -211,11 +211,11 @@ private fun ChangeScreenNavCtl(navController: NavHostController, masterNavCtl: N
             enterTransition = {
                 when (initialState.destination.route) {
                     Screens.Info.route -> {
-                        slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                        slideIntoContainer(AnimatedContentScope.SlideDirection.Left, SCREEN_ANIMATION)
                     }
                     Screens.Comment.route,
                     Screens.Vote.route -> {
-                        slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                        slideIntoContainer(AnimatedContentScope.SlideDirection.Right, SCREEN_ANIMATION)
                     }
                     else -> null
                 }
@@ -223,11 +223,11 @@ private fun ChangeScreenNavCtl(navController: NavHostController, masterNavCtl: N
             exitTransition = {
                 when (targetState.destination.route) {
                     Screens.Info.route -> {
-                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, SCREEN_ANIMATION)
                     }
                     Screens.Comment.route,
                     Screens.Vote.route -> {
-                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, SCREEN_ANIMATION)
                     }
                     else -> null
                 }
@@ -241,10 +241,10 @@ private fun ChangeScreenNavCtl(navController: NavHostController, masterNavCtl: N
                 when (initialState.destination.route) {
                     Screens.Info.route,
                     Screens.Code.route -> {
-                        slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                        slideIntoContainer(AnimatedContentScope.SlideDirection.Left, SCREEN_ANIMATION)
                     }
                     Screens.Comment.route -> {
-                        slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                        slideIntoContainer(AnimatedContentScope.SlideDirection.Right, SCREEN_ANIMATION)
                     }
                     else -> null
                 }
@@ -253,10 +253,10 @@ private fun ChangeScreenNavCtl(navController: NavHostController, masterNavCtl: N
                 when (targetState.destination.route) {
                     Screens.Info.route,
                     Screens.Code.route -> {
-                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, SCREEN_ANIMATION)
                     }
                     Screens.Comment.route -> {
-                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, SCREEN_ANIMATION)
                     }
                     else -> null
                 }
@@ -271,7 +271,7 @@ private fun ChangeScreenNavCtl(navController: NavHostController, masterNavCtl: N
                     Screens.Code.route,
                     Screens.Vote.route,
                     Screens.Info.route -> {
-                        slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(250))
+                        slideIntoContainer(AnimatedContentScope.SlideDirection.Left, SCREEN_ANIMATION)
                     }
                     else -> null
                 }
@@ -281,7 +281,7 @@ private fun ChangeScreenNavCtl(navController: NavHostController, masterNavCtl: N
                     Screens.Code.route,
                     Screens.Vote.route,
                     Screens.Info.route -> {
-                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(250))
+                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, SCREEN_ANIMATION)
                     }
                     else -> null
                 }

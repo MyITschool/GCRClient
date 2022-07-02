@@ -66,7 +66,6 @@ object PasswordCrypto {
 //            GCMParameterSpec(128, cipherInstance.iv)
 //        )
 //        return ByteString.copyFrom(cipherInstance.doFinal(values.toByteArray(charset)))
-        printUnsecuredMsg()
         return ByteString.copyFrom(values.toByteArray(charset))
     }
 
@@ -77,16 +76,7 @@ object PasswordCrypto {
 //            GCMParameterSpec(128, cipherInstance.iv)
 //        )
 //        return cipherInstance.doFinal(values.toByteArray()).toString(charset)
-        printUnsecuredMsg()
         return values.toByteArray().toString(charset)
-    }
-
-    private fun printUnsecuredMsg() {
-        Log.e(Constants.LOG_TAG, "NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE")
-        Log.e(Constants.LOG_TAG, "NOTICE                             NOTICE")
-        Log.e(Constants.LOG_TAG, "NOTICE   ENCRYPTION NOT IN USE!!   NOTICE")
-        Log.e(Constants.LOG_TAG, "NOTICE                             NOTICE")
-        Log.e(Constants.LOG_TAG, "NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE")
     }
 
 }

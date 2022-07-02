@@ -1,4 +1,4 @@
-package com.elseboot3909.gcrclient.viewmodel.search
+package com.elseboot3909.gcrclient.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

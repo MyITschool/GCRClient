@@ -1,9 +1,10 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 
 package com.elseboot3909.gcrclient.ui.search.screens
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
@@ -24,15 +25,18 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.entity.external.ProjectInfo
+import com.elseboot3909.gcrclient.repository.ProjectsListRepository
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
-import com.elseboot3909.gcrclient.viewmodel.search.ProjectsListViewModel
+import com.elseboot3909.gcrclient.viewmodel.ProjectsListViewModel
 import com.elseboot3909.gcrclient.repository.SearchParamsRepository
+import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.koin.androidx.compose.get
@@ -46,8 +50,9 @@ fun ProjectsListContent(navController: NavHostController) {
 @Composable
 private fun ProjectsListTopAppBar(
     navController: NavHostController,
-    projectsModel: ProjectsListViewModel = getViewModel(),
-    searchParamsRepo: SearchParamsRepository = get()
+    plViewModel: ProjectsListViewModel = getViewModel(owner = LocalContext.current as MasterActivity),
+    plRepo: ProjectsListRepository = get(),
+    spRepo: SearchParamsRepository = get()
 ) {
     var searchStr by remember { mutableStateOf("") }
     Scaffold(
@@ -72,12 +77,12 @@ private fun ProjectsListTopAppBar(
             }
         },
         floatingActionButton = {
-            val selectedCount = searchParamsRepo.selectedProjectsCounter.collectAsState()
+            val counter = spRepo.selectedProjectsCounter.collectAsState(0)
             ExtendedFloatingActionButton(
-                text = { Text(text = "Select ${selectedCount.value} " + if (selectedCount.value == 1) "project" else "projects") },
+                text = { Text(text = "Select ${counter.value} " + if (counter.value == 1) "project" else "projects") },
                 icon = {
                     Icon(
-                        imageVector = if (selectedCount.value <= 1) Icons.Default.Done else Icons.Default.DoneAll,
+                        imageVector = if (counter.value <= 1) Icons.Default.Done else Icons.Default.DoneAll,
                         contentDescription = null
                     )
                 },
@@ -89,11 +94,12 @@ private fun ProjectsListTopAppBar(
         }
     ) {
         Box(modifier = Modifier.padding(it)) {
-            ProjectsList( projectsModel, searchStr)
+            ProjectsList(plViewModel, plRepo, searchStr)
         }
     }
     BackHandler(true) {
-        searchParamsRepo.restoreProjects()
+        spRepo.preSelectedProjects = ArrayList(spRepo.selectedProjects)
+        spRepo.selectedProjectsCounter.value = spRepo.preSelectedProjects.size
         navController.popBackStack()
     }
 }
@@ -101,15 +107,16 @@ private fun ProjectsListTopAppBar(
 
 @Composable
 private fun ProjectsList(
-    projectsModel: ProjectsListViewModel,
+    plViewModel: ProjectsListViewModel,
+    plRepo: ProjectsListRepository,
     searchStr: String
 ) {
-    val projectsMap: HashMap<String, ProjectInfo> by projectsModel.projects.observeAsState(HashMap())
+    val projectsMap: HashMap<String, ProjectInfo> by plViewModel.projectsList.observeAsState(HashMap())
     val projectsList = projectsMap.keys.toList().sorted().map { n -> n }
         .filter { n -> n.contains(searchStr) || searchStr.isEmpty() }
     SwipeRefresh(
         state = rememberSwipeRefreshState(false),
-        onRefresh = { projectsModel.refreshProjects() }) {
+        onRefresh = { plRepo.loadProjectList() }) {
         LazyColumn(modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)) {
             items(
                 count = projectsList.size,
@@ -131,10 +138,10 @@ private fun ProjectsList(
 @Composable
 private fun ProjectsListItem(
     projectInfo: ProjectInfo,
-    searchParamsRepo: SearchParamsRepository = get()
+    spRepo: SearchParamsRepository = get()
 ) {
     val projectName = Uri.decode(projectInfo.id)
-    var isSelected by remember { mutableStateOf(searchParamsRepo.selectedProjects.contains(projectName)) }
+    var isSelected by remember { mutableStateOf(spRepo.preSelectedProjects.contains(projectName)) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,11 +149,15 @@ private fun ProjectsListItem(
             .clip(RoundedCornerShape(8.dp))
             .clickable {
                 isSelected = !isSelected
+                var counter = spRepo.selectedProjectsCounter.value
                 if (isSelected) {
-                    searchParamsRepo.appendSelectedProjects(projectName)
+                    spRepo.preSelectedProjects.add(projectName)
+                    counter++
                 } else {
-                    searchParamsRepo.removeSelectedProject(projectName)
+                    spRepo.preSelectedProjects.remove(projectName)
+                    counter--
                 }
+                spRepo.selectedProjectsCounter.value = counter
             },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(

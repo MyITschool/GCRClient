@@ -1,45 +1,39 @@
 <resources>
-    <string name="app_name">GCRClient</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-    <string name="hello_fragment_introduction">Welcome to GCRClient</string>
-    <string name="hello_fragment_get_started">Get started</string>
-    <string name="hello_fragment_what_is">What is Gerrit?</string>
-    <string name="input_fragment_introduction">Login</string>
-    <string name="input_fragment_check_connection">Check connection</string>
-    <string name="server_hint">Server</string>
-    <string name="input_fragment_bad_connection">Failed to get response from server</string>
-    <string name="input_fragment_bad_server_name">Incorrect server address</string>
-    <string name="username_hint">Username</string>
-    <string name="password_hint">Password</string>
-    <string name="input_fragment_lets_go">Let\'s go</string>
-    <string name="input_fragment_bad_username">Failed to verify username</string>
-    <string name="input_fragment_bad_password">Wrong password</string>
-    <string name="input_fragment_already_logged">Already logged in</string>
-    <string name="input_fragment_unknown_error">Unknown error, try again</string>
-    <string name="search">Search</string>
+    <string name="app_name" translatable="false">GCRClient</string>
+    <string name="welcome">Welcome to GCRClient</string>
+    <string name="what_is">What is Gerrit?</string>
+    <string name="get_started">Get started</string>
+    <string name="login">Login</string>
+    <string name="server">Server</string>
+    <string name="bad_server_url">Incorrect server address</string>
+    <string name="check_connection">Check connection</string>
+    <string name="no_response">Failed to get response from server</string>
+    <string name="already_logged">Already logged in</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="bad_username">Failed to verify username</string>
+    <string name="bad_password">Wrong password</string>
+    <string name="lets_go">Let\'s go</string>
+    <string name="log_out_question">Are you sure you want to log out?</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
     <string name="selected_server">Selected server:</string>
-    <string name="info">Info</string>
-    <string name="code">Code</string>
-    <string name="vote">Vote</string>
-    <string name="log">Log</string>
-    <string name="comment">Comment</string>
-    <string name="explore">Explore</string>
-    <string name="stared">Stared</string>
-    <string name="profile">Profile</string>
-    <string name="total_starred_changes">Total starred changes: %1$d</string>
-    <string name="author">Author</string>
+    <string name="manage_servers">Manage servers</string>
+    <string name="switch_server">Switch server</string>
+    <string name="add_server">Add new server</string>
+    <string name="log_out">Log out from server</string>
+    <string name="wip" translatable="false">WIP</string>
+    <string name="active" translatable="false">Active</string>
+    <string name="abandoned" translatable="false">Abandoned</string>
+    <string name="merged" translatable="false">Merged</string>
     <string name="owner">Owner</string>
+    <string name="reviewer">Reviewer</string>
+    <string name="author">Author</string>
     <string name="project">Project</string>
     <string name="branch">Branch</string>
-    <string name="wip">WIP</string>
-    <string name="active">Active</string>
-    <string name="abandoned">Abandoned</string>
-    <string name="merged">Merged</string>
-    <string name="reviewer">Reviewer</string>
-    <string name="cc">CC</string>
     <string name="labels">Labels</string>
     <string name="topic">Topic</string>
-    <string name="select_server">Select server</string>
-    <string name="title_activity_server">Server</string>
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    <string name="cc" translatable="false">CC</string>
 </resources>

@@ -14,15 +14,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.elseboot3909.gcrclient.Loader
+import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.ServerData
 import com.elseboot3909.gcrclient.remote.api.ConfigAPI
 import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.ui.login.Screens
 import com.elseboot3909.gcrclient.utils.Constants
 import com.elseboot3909.gcrclient.viewmodel.CredentialsViewModel
-import io.ktor.client.call.*
+import io.ktor.client.call.body
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import java.net.URL
@@ -33,8 +36,8 @@ internal fun ServerInput(
     credentialsViewModel: CredentialsViewModel = getViewModel(owner = LocalContext.current as MasterActivity)
 ) {
     val scope = rememberCoroutineScope()
+    val app = LocalContext.current.applicationContext as Loader
     val serversList = credentialsViewModel.serversList.observeAsState()
-    val finalServersList: List<ServerData> = serversList.value?.serverDataList?.mapNotNull { it } ?: ArrayList()
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val screenWidth = LocalConfiguration.current.screenWidthDp
     var showProgress by remember { mutableStateOf(false) }
@@ -46,7 +49,7 @@ internal fun ServerInput(
             .padding(start = 32.dp, top = (screenHeight * 0.45).dp)
     ) {
         Text(
-            "Login",
+            stringResource(R.string.login),
             style = MaterialTheme.typography.displayLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -67,9 +70,9 @@ internal fun ServerInput(
                 onValueChange = {
                     serverURL = it.trim()
                     isError = false
-                    msgError = "Incorrect server address"
+                    msgError = msgError
                 },
-                label = { Text(text = "Server") },
+                label = { Text(text = stringResource(R.string.server)) },
                 singleLine = true,
                 isError = isError,
                 modifier = Modifier.width(if (screenWidth * 0.7 > 256) 256.dp else (screenWidth * 0.7).dp)
@@ -85,10 +88,10 @@ internal fun ServerInput(
         }
         Button(onClick = {
             showProgress = true
-            for (serverData in finalServersList) {
+            for (serverData in serversList.value ?: ArrayList()) {
                 if (serverData.serverURL.contains(serverURL) || serverURL.contains(serverData.serverURL)) {
                     showProgress = false
-                    msgError = "Already logged in"
+                    msgError = app.getString(R.string.already_logged)
                     isError = true
                     break
                 }
@@ -101,20 +104,19 @@ internal fun ServerInput(
                         if (response.status.value in 200..299) {
                             navController.navigate(route = "${Screens.Login.route}/${Uri.encode(serverURL)}")
                         } else {
-                            Log.e(Constants.LOG_TAG, response.body())
-                            msgError = "Failed to get response from server"
+                            msgError = app.getString(R.string.no_response)
                             isError = true
                         }
                         showProgress = false
                     }
                 } catch (e: Exception) {
                     showProgress = false
-                    msgError = "Incorrect server address"
+                    msgError = app.getString(R.string.bad_server_url)
                     isError = true
                 }
             }
         }) {
-            Text(text = "Check connection")
+            Text(text = app.getString(R.string.check_connection))
         }
     }
 

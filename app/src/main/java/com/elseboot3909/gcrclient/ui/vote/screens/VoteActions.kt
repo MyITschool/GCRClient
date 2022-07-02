@@ -3,6 +3,7 @@
 package com.elseboot3909.gcrclient.ui.vote.screens
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -35,6 +36,7 @@ import com.elseboot3909.gcrclient.remote.api.ChangesAPI
 import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.repository.ChangeInfoRepository
 import com.elseboot3909.gcrclient.repository.ProgressBarRepository
+import com.elseboot3909.gcrclient.utils.Constants
 import com.elseboot3909.gcrclient.viewmodel.ChangeInfoViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
@@ -118,7 +120,7 @@ object VoteActions : KoinComponent {
             floatingActionButtonPosition = FabPosition.Center
         ) {
             Box(modifier = Modifier.padding(it)) {
-                VoteActionsContent(changeInfo, values)
+                VoteActionsContent(changeInfo, values, label)
             }
         }
     }
@@ -126,7 +128,8 @@ object VoteActions : KoinComponent {
     @Composable
     private fun VoteActionsContent(
         changeInfo: ChangeInfo,
-        labels: ArrayList<String>
+        labels: ArrayList<String>,
+        labelName: String
     ) {
         Column(
             modifier = Modifier
@@ -168,7 +171,7 @@ object VoteActions : KoinComponent {
                             )
                         }
                         Text(
-                            text = changeInfo.labels[label]?.values?.get(label) ?: "",
+                            text = changeInfo.labels[labelName]?.values?.get(label) ?: "",
                             style = MaterialTheme.typography.labelLarge
                         )
                     }

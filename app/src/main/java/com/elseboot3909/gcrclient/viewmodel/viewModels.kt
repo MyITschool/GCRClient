@@ -1,11 +1,14 @@
 package com.elseboot3909.gcrclient.viewmodel
 
-import com.elseboot3909.gcrclient.viewmodel.home.ChangesViewModel
-import com.elseboot3909.gcrclient.viewmodel.search.ProjectsListViewModel
-import com.elseboot3909.gcrclient.viewmodel.search.UsersListViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
+
+/**
+ * This Koin module contains all ViewModels.
+ * In order to get any of them use getViewModel().
+ * As lifecycle owner parameter use MasterActivity class object as this is single activity application.
+ */
 val viewModels = module {
     viewModel { StarredViewModel(get()) }
     viewModel { ChangedFilesViewModel(get()) }
@@ -13,9 +16,10 @@ val viewModels = module {
     viewModel { ProgressBarViewModel(get()) }
     viewModel { CommentsViewModel(get()) }
     viewModel { ChangeInfoViewModel(get()) }
-    viewModel { CredentialsViewModel() }
+    viewModel { ProjectsListViewModel(get()) }
+    viewModel { CredentialsViewModel(get()) }
+    viewModel { SearchParamsViewModel(get()) }
+    viewModel { ChangesListViewModel(get(), get()) }
 
-    single { ChangesViewModel(get(), get()) }
-    single { ProjectsListViewModel(get()) }
     single { UsersListViewModel(get()) }
 }

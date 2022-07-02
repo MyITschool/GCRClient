@@ -1,8 +1,10 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 
 package com.elseboot3909.gcrclient.ui.search.screens
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,13 +24,18 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
 import com.elseboot3909.gcrclient.ui.search.Screens
 import com.elseboot3909.gcrclient.repository.SearchParamsRepository
+import com.elseboot3909.gcrclient.ui.MasterActivity
+import com.elseboot3909.gcrclient.utils.Constants
+import com.elseboot3909.gcrclient.viewmodel.SearchParamsViewModel
 import org.koin.androidx.compose.get
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun MainSearch(
@@ -42,9 +50,9 @@ private fun MainSearchTopAppBar(
     navController: NavHostController,
     masterNavCtl: NavHostController,
     screenWidth: Int = LocalConfiguration.current.screenWidthDp,
-    searchRepo: SearchParamsRepository = get()
+    spRepo: SearchParamsRepository = get()
 ) {
-    var searchStr by remember { mutableStateOf(searchRepo.searchString) }
+    var searchStr by remember { mutableStateOf(spRepo.searchString.value) }
     Scaffold(
         topBar = {
             TopAppBar(backgroundColor = getBackgroundColor()) {
@@ -52,7 +60,7 @@ private fun MainSearchTopAppBar(
                 BasicTextField(
                     value = searchStr,
                     onValueChange = {
-                        searchRepo.searchString = it
+                        spRepo.searchString.value = it
                         searchStr = it
                     },
                     modifier = Modifier
@@ -74,8 +82,10 @@ private fun MainSearchTopAppBar(
                 text = { Text(text = "Search") },
                 icon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) },
                 onClick = {
-                    searchRepo.applySearchParams()
-                    searchRepo.offset.value = 0
+                    spRepo.selectedProjects = ArrayList(spRepo.preSelectedProjects)
+                    spRepo.selectedUsers = ArrayList(spRepo.preSelectedUsers)
+                    spRepo.oldSearchString.value = spRepo.searchString.value
+                    spRepo.buildQueryString()
                     masterNavCtl.popBackStack()
                 }
             )
@@ -86,7 +96,11 @@ private fun MainSearchTopAppBar(
         }
     }
     BackHandler(true) {
-        searchRepo.restoreSearchParams()
+        spRepo.preSelectedProjects = ArrayList(spRepo.selectedProjects)
+        spRepo.preSelectedUsers = ArrayList(spRepo.selectedUsers)
+        spRepo.searchString.value = spRepo.oldSearchString.value
+        spRepo.selectedUsersCounter.value = spRepo.preSelectedUsers.size
+        spRepo.selectedProjectsCounter.value = spRepo.preSelectedProjects.size
         masterNavCtl.popBackStack()
     }
 }
@@ -95,7 +109,7 @@ private fun MainSearchTopAppBar(
 private fun MainSearchContent(
     navController: NavHostController,
     screenWidth: Int,
-    searchRepo: SearchParamsRepository = get()
+    spRepo: SearchParamsRepository = get()
 ) {
     Column(modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 8.dp)) {
         Row(
@@ -120,8 +134,9 @@ private fun MainSearchContent(
                     .defaultMinSize(minHeight = 32.dp)
                     .wrapContentSize()
             ) {
+                val counter = spRepo.selectedProjectsCounter.collectAsState(0)
                 Text(
-                    text = searchRepo.selectedProjectsCounter.value.let { if (it == 0) "Select project" else "$it selected" },
+                    text = counter.value.let { if (it == 0) "Select project" else "$it selected" },
                     style = MaterialTheme.typography.labelLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -151,8 +166,9 @@ private fun MainSearchContent(
                     .defaultMinSize(minHeight = 32.dp)
                     .wrapContentSize()
             ) {
+                val counter = spRepo.selectedUsersCounter.collectAsState(0)
                 Text(
-                    text = searchRepo.selectedUsersCounter.value.let { if (it == 0) "Select user" else "$it selected" },
+                    text = counter.value.let { if (it == 0) "Select user" else "$it selected" },
                     style = MaterialTheme.typography.labelLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

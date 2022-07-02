@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome">Добро пожаловать в GCRClient</string>
+    <string name="what_is">Что такое Gerrit?</string>
+    <string name="get_started">Начать</string>
+    <string name="login">Вход</string>
+    <string name="server">Сервер</string>
+    <string name="bad_server_url">Неверный адрес сервера</string>
+    <string name="check_connection">Проверить соединение</string>
+    <string name="no_response">Не удалось получить ответ с сервера</string>
+    <string name="already_logged">Вход уже совершён</string>
+    <string name="username">Пользователь</string>
+    <string name="password">Пароль</string>
+    <string name="bad_username">Не удалось проверить пользователя</string>
+    <string name="bad_password">Неверный пароль</string>
+    <string name="lets_go">Поехали</string>
+    <string name="log_out_question">Вы уверены, что хотите выйти?</string>
+    <string name="cancel">Отмена</string>
+    <string name="yes">Да</string>
+    <string name="selected_server">Выбранный сервер:</string>
+    <string name="manage_servers">Управляйте серверами</string>
+    <string name="switch_server">Переключить сервер</string>
+    <string name="add_server">Добавить новый сервер</string>
+    <string name="log_out">Выйти из сервера</string>
+    <string name="owner">Владелец</string>
+    <string name="reviewer">Оценивающие</string>
+    <string name="author">Автор</string>
+    <string name="project">Проект</string>
+    <string name="branch">Ветка</string>
+    <string name="labels">Метки</string>
+    <string name="topic">Тема</string>
+    <string name="save">Сохранить</string>
+    <string name="edit">Редактировать</string>
+</resources>

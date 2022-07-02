@@ -10,7 +10,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 
-
+/**
+ * This data store class collects selected server index. Saving index is
+ * needed to load same server user browsed last time or immediately switch it.
+ */
 internal class SelectedDataStore(context: Context) {
     private val name = "selectedServer"
 
@@ -22,6 +25,11 @@ internal class SelectedDataStore(context: Context) {
 
     val selected: Flow<Int> = dataStore.data.map { it[selectedServer] ?: 0 }
 
+    /**
+     * This function allows to change selected server
+     *
+     * @param i index of server position (from 0 to n - 1)
+     */
     fun updateSelected(i: Int) {
         runBlocking {
             dataStore.edit {

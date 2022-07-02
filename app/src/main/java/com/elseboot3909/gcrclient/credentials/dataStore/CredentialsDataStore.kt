@@ -9,6 +9,9 @@ import com.elseboot3909.gcrclient.credentials.ServersListSerializer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
 
+/**
+ *
+ */
 internal class CredentialsDataStore (context: Context) {
     private val fileName = "servers_data.pb"
 
@@ -25,6 +28,11 @@ internal class CredentialsDataStore (context: Context) {
         }
     }
 
+    /**
+     * This function allows to add server data into storage
+     *
+     * @param serverData data of the server to be added
+     */
     fun addServerData(serverData: ServerData) {
         runBlocking {
             dataStore.updateData {
@@ -33,6 +41,11 @@ internal class CredentialsDataStore (context: Context) {
         }
     }
 
+    /**
+     * This function allows to remove server data from storage by server's URL
+     *
+     * @param serverUrl the URL of the server to be removed
+     */
     fun removeServerData(serverUrl: String) {
         runBlocking {
             dataStore.updateData { list ->

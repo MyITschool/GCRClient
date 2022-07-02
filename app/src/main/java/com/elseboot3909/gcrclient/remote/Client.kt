@@ -14,8 +14,16 @@ import org.koin.androidx.compose.getViewModel
 import org.koin.dsl.module
 import kotlin.IndexOutOfBoundsException
 
+/**
+ * This Koin module generates Ktor client with current server data to run http requests.
+ */
 val client = module {
 
+    /**
+     * Ths function generates Ktor client with provided [serverData]
+     *
+     * @param serverData required server data. Leave both username and password fields empty to skip authentication.
+     */
     fun getClient(serverData: ServerData): HttpClient {
         return HttpClient(Android) {
             defaultRequest {
@@ -36,7 +44,7 @@ val client = module {
         }
     }
 
-    factory { get<CredentialsRepository>().currentServerData }
+    factory { get<CredentialsRepository>().currentServerData.value }
 
     factory { (params: ServerData?) ->
         getClient(params ?: get())

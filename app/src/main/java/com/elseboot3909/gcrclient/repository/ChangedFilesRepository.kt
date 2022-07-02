@@ -11,6 +11,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 
+/**
+ * This repository contains map of changed files and parameters required to get current diff.
+ * Repository collects data from ChangedInfpRepository and fetches data for current change if it was changed.
+ * Getting new changeInfo also sets [base] to 0 and [revision] to last revision.
+ */
 class ChangedFilesRepository(
     private val pbRepo: ProgressBarRepository,
     private val ciRepo: ChangeInfoRepository
@@ -25,7 +30,13 @@ class ChangedFilesRepository(
         CoroutineScope(Dispatchers.IO).launch {
             ciRepo.changeInfo.collect {
                 base.value = 0
-                revision.value = it.let { it.revisions.keys.sortedWith(compareBy { i -> it.revisions[i]?._number }) }.last()
+                if (it.revisions.isNotEmpty()) {
+                    revision.value = it.let {
+                        it.revisions.keys.sortedWith(compareBy { i -> it.revisions[i]?._number })
+                    }.last()
+                } else {
+                    revision.value = ""
+                }
                 id.value = it
                 loadChangedFiles()
             }

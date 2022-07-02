@@ -3,6 +3,7 @@
 package com.elseboot3909.gcrclient.ui.login.screens
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -11,16 +12,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.elseboot3909.gcrclient.Loader
+import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.ServerData
 import com.elseboot3909.gcrclient.credentials.PasswordCrypto
 import com.elseboot3909.gcrclient.credentials.dataStore.CredentialsDataStore
+import com.elseboot3909.gcrclient.credentials.dataStore.SelectedDataStore
 import com.elseboot3909.gcrclient.entity.external.AccountInfo
 import com.elseboot3909.gcrclient.remote.api.AccountAPI
+import com.elseboot3909.gcrclient.repository.CredentialsRepository
 import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.ui.MasterScreens
+import com.elseboot3909.gcrclient.utils.Constants
+import com.elseboot3909.gcrclient.utils.JsonUtils
+import io.ktor.client.call.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
 import org.koin.android.ext.android.get
 
 @Composable
@@ -43,7 +53,7 @@ internal fun CredentialsInput(
             .padding(start = 32.dp, top = (screenHeight * 0.45).dp)
     ) {
         Text(
-            "Login",
+            stringResource(R.string.login),
             style = MaterialTheme.typography.displayLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -64,7 +74,7 @@ internal fun CredentialsInput(
                     username = it.trim()
                     isUsernameError = false
                 },
-                label = { Text(text = "Username") },
+                label = { Text(text = stringResource(R.string.username)) },
                 isError = isUsernameError,
                 singleLine = true,
                 modifier = Modifier
@@ -72,7 +82,7 @@ internal fun CredentialsInput(
             )
             if (isUsernameError) {
                 Text(
-                    text = "Failed to verify username",
+                    text = stringResource(R.string.bad_username),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(start = 14.dp)
@@ -81,14 +91,16 @@ internal fun CredentialsInput(
         }
         var password by remember { mutableStateOf("") }
         var isPasswordError by remember { mutableStateOf(false) }
-        Column(modifier = Modifier.wrapContentHeight().padding(bottom = 16.dp)) {
+        Column(modifier = Modifier
+            .wrapContentHeight()
+            .padding(bottom = 16.dp)) {
             OutlinedTextField(
                 value = password,
                 onValueChange = {
                     password = it.trim()
                     isPasswordError = false
                 },
-                label = { Text(text = "Password") },
+                label = { Text(text = stringResource(R.string.password)) },
                 isError = isPasswordError,
                 singleLine = true,
                 modifier = Modifier
@@ -96,7 +108,7 @@ internal fun CredentialsInput(
             )
             if (isPasswordError) {
                 Text(
-                    text = "Wrong password",
+                    text = stringResource(R.string.bad_password),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(start = 14.dp)
@@ -110,21 +122,27 @@ internal fun CredentialsInput(
                     ServerData.newBuilder().setServerURL(serverURL).build(), AccountInfo(username = username)
                 )
                 if (response.status.value in 200..299) {
+                    val realUsername = JsonUtils.json.decodeFromString<AccountInfo>(
+                        JsonUtils.trimJson(response.body())
+                    ).username
                     val serverData = ServerData
                         .newBuilder()
                         .setServerURL(serverURL)
-                        .setUsername(username)
+                        .setUsername(realUsername)
                         .setPassword(PasswordCrypto.encryptString(password))
                         .build()
-                    response = AccountAPI.getAccountDetails(serverData, AccountInfo(username = username))
+                    Log.e(Constants.LOG_TAG, realUsername)
+                    response = AccountAPI.getAccountDetails(serverData, AccountInfo(username = realUsername))
                     if (response.status.value in 200..299) {
                         serverData?.let {
                             activity.get<CredentialsDataStore>().addServerData(it)
                         }
+                        activity.get<SelectedDataStore>().updateSelected(activity.get<CredentialsRepository>().serversList.value.size - 1)
                         if(isInit) {
                             masterNavCtl.navigate(route = MasterScreens.HomeScreen.route)
                         } else {
-                            activity.restartRequest()
+                            activity.resetData()
+                            masterNavCtl.popBackStack()
                         }
                     } else {
                         isPasswordError = true
@@ -135,7 +153,7 @@ internal fun CredentialsInput(
                 showProgress = false
             }
         }) {
-            Text(text = "Let's go")
+            Text(text = stringResource(R.string.lets_go))
         }
     }
 }

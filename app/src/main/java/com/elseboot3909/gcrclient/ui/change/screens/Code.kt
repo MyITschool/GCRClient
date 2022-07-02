@@ -59,7 +59,7 @@ internal fun Code(
             verticalAlignment = Alignment.CenterVertically
         ) {
             patchsetSelection(
-                onSelect = { i -> cfRepo.base.value = i },
+                onSelect = { i -> cfRepo.base.value = i; cfRepo.loadChangedFiles() },
                 selected = base,
                 from = 0,
                 to = revisions.indexOf(revision) + 1
@@ -70,7 +70,7 @@ internal fun Code(
                 modifier = Modifier.size((screenWidth * 0.075).dp)
             )
             patchsetSelection(
-                onSelect = { i -> cfRepo.revision.value = revisions[i - 1] },
+                onSelect = { i -> cfRepo.revision.value = revisions[i - 1]; cfRepo.loadChangedFiles() },
                 selected = revisions.indexOf(revision) + 1,
                 from = base + 1,
                 to = revisions.size + 1

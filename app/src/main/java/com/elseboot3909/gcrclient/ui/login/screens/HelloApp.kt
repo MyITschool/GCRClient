@@ -11,8 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.elseboot3909.gcrclient.R
 import com.elseboot3909.gcrclient.ui.MasterActivity
 import com.elseboot3909.gcrclient.ui.login.Screens
 
@@ -27,7 +29,7 @@ internal fun HelloApp(navController: NavController) {
             .padding(start = 32.dp), verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "Welcome to GCRClient",
+            stringResource(R.string.welcome),
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -46,7 +48,7 @@ internal fun HelloApp(navController: NavController) {
             Modifier.padding(start = 32.dp)
         ) {
             Text(
-                text = "What is Gerrit?",
+                text = stringResource(R.string.what_is),
                 style = MaterialTheme.typography.labelLarge
             )
         }
@@ -55,7 +57,7 @@ internal fun HelloApp(navController: NavController) {
             Modifier.padding(end = 32.dp)
         ) {
             Text(
-                text = "Get started",
+                text = stringResource(R.string.get_started),
                 style = MaterialTheme.typography.labelLarge
             )
         }

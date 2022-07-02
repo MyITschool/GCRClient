@@ -6,13 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.elseboot3909.gcrclient.repository.ProgressBarRepository
 import kotlinx.coroutines.launch
 
-class ProgressBarViewModel(progressBarRepository: ProgressBarRepository) : ViewModel() {
+class ProgressBarViewModel(pbRepo: ProgressBarRepository) : ViewModel() {
 
     val isVisible = MutableLiveData(false)
 
     init {
         viewModelScope.launch {
-            progressBarRepository.requestsCounter.collect {
+            pbRepo.requestsCounter.collect {
                 isVisible.postValue(it != 0)
             }
         }

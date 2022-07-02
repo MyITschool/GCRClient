@@ -7,6 +7,10 @@ import com.elseboot3909.gcrclient.entity.external.FileInfo
 import com.elseboot3909.gcrclient.repository.ChangedFilesRepository
 import kotlinx.coroutines.launch
 
+/**
+ * This ViewModel contains map of changed files in diff and parameters of diff.
+ * To manage values use [ChangedFilesRepository].
+ */
 class ChangedFilesViewModel(
     private val cfRepo: ChangedFilesRepository
 ) : ViewModel() {

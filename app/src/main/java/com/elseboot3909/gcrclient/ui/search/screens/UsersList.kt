@@ -2,6 +2,7 @@
 
 package com.elseboot3909.gcrclient.ui.search.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
@@ -35,7 +36,8 @@ import com.elseboot3909.gcrclient.entity.internal.getAvatar
 import com.elseboot3909.gcrclient.ui.common.getBackgroundColor
 import com.elseboot3909.gcrclient.utils.AccountUtils
 import com.elseboot3909.gcrclient.repository.SearchParamsRepository
-import com.elseboot3909.gcrclient.viewmodel.search.UsersListViewModel
+import com.elseboot3909.gcrclient.viewmodel.SearchParamsViewModel
+import com.elseboot3909.gcrclient.viewmodel.UsersListViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.koin.androidx.compose.get
@@ -50,7 +52,8 @@ fun UsersListContent(navController: NavHostController) {
 private fun UsersListTopAppBar(
     navController: NavHostController,
     usersModel: UsersListViewModel = getViewModel(),
-    searchParamsRepo: SearchParamsRepository = get()
+    spViewModel: SearchParamsViewModel = getViewModel(),
+    spRepo: SearchParamsRepository = get()
 ) {
     var searchStr by remember { mutableStateOf("") }
     Scaffold(
@@ -75,12 +78,12 @@ private fun UsersListTopAppBar(
             }
         },
         floatingActionButton = {
-            val selectedCount = searchParamsRepo.selectedUsersCounter.collectAsState()
+            val counter = spViewModel.projectsCounter.observeAsState(0)
             ExtendedFloatingActionButton(
-                text = { Text(text = "Select ${selectedCount.value} " + if (selectedCount.value == 1) "user" else "users") },
+                text = { Text(text = "Select ${counter.value} " + if (counter.value == 1) "user" else "users") },
                 icon = {
                     Icon(
-                        imageVector = if (selectedCount.value <= 1) Icons.Default.Done else Icons.Default.DoneAll,
+                        imageVector = if (counter.value <= 1) Icons.Default.Done else Icons.Default.DoneAll,
                         contentDescription = null
                     )
                 },
@@ -94,6 +97,11 @@ private fun UsersListTopAppBar(
         Box(modifier = Modifier.padding(it)) {
             UsersList(usersModel, searchStr)
         }
+    }
+    BackHandler(true) {
+        spRepo.preSelectedUsers = ArrayList(spRepo.selectedUsers)
+        spRepo.selectedUsersCounter.value = spRepo.preSelectedUsers.size
+        navController.popBackStack()
     }
 }
 
@@ -129,9 +137,9 @@ private fun UsersList(
 @Composable
 private fun UserListItem(
     accountInfo: AccountInfo,
-    searchParamsRepo: SearchParamsRepository = get()
+    spRepo: SearchParamsRepository = get()
 ) {
-    var isSelected by remember { mutableStateOf(searchParamsRepo.selectedUsers.contains(accountInfo._account_id)) }
+    var isSelected by remember { mutableStateOf(spRepo.preSelectedUsers.contains(accountInfo._account_id)) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -139,11 +147,15 @@ private fun UserListItem(
             .clip(RoundedCornerShape(8.dp))
             .clickable {
                 isSelected = !isSelected
+                var counter = spRepo.selectedUsersCounter.value
                 if (isSelected) {
-                    searchParamsRepo.appendSelectedUser(accountInfo._account_id)
+                    spRepo.preSelectedUsers.add(accountInfo._account_id)
+                    counter++
                 } else {
-                    searchParamsRepo.removeSelectedUser(accountInfo._account_id)
+                    spRepo.preSelectedUsers.remove(accountInfo._account_id)
+                    counter--
                 }
+                spRepo.selectedUsersCounter.value = counter
             },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
@@ -167,7 +179,7 @@ private fun UserListItem(
             )
             Column(modifier = Modifier.padding(start = 6.dp)) {
                 Text(
-                    text = accountInfo.display_name,
+                    text = AccountUtils.getShowedName(accountInfo),
                     style = MaterialTheme.typography.titleSmall,
                     color = Color.Black,
                 )

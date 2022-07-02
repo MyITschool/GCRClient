@@ -9,3 +9,4 @@ val voteBoxGoodColor = Color(0xFFE3F7EA)
 val voteBoxBadColor = Color(0xFFFFB0B0)
 val voteBoxNeutralColor = Color(0xFFC5C7C9)
 val voteBoxBorder = Color(0xFF79747E)
+
